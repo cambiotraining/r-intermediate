@@ -1,0 +1,139 @@
+---
+title: "dplyr tutorial"
+author: "Luke Skywalker"
+date: "26 August 2015"
+output: html_document
+---
+
+Following http://genomicsclass.github.io/book/pages/dplyr_tutorial.html
+
+Download the example file
+
+```{r}
+library(downloader)
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/msleep_ggplot2.csv"
+filename <- "msleep_ggplot2.csv"
+if (!file.exists(filename)) download(url,filename)
+msleep <- read.csv("msleep_ggplot2.csv")
+head(msleep)
+```
+
+Create a tbl_df representation
+
+```{r, echo=FALSE}
+library(dplyr)
+msleep <- tbl_df(msleep)
+msleep
+
+```
+
+## Selecting columns
+
+```{r}
+sleepData <- select(msleep, name, sleep_total)
+sleepData
+```
+
+```{r}
+select(msleep, -name)
+```
+
+```{r}
+select(msleep, name:order)
+```
+
+```{r}
+select(msleep, starts_with("sl"))
+```
+
+## Selecting rows
+
+```{r}
+filter(msleep, sleep_total >= 16)
+```
+
+
+```{r}
+filter(msleep, sleep_total >= 16, bodywt >= 1)
+```
+
+
+```{r}
+filter(msleep, order %in% c("Perissodactyla", "Primates"))
+```
+
+## Piping....
+
+```{r}
+msleep %>% 
+    select(name, sleep_total) %>% 
+    head
+```
+
+
+```{r}
+msleep %>% arrange(order)
+```
+
+## Arranging or re-ordering rows
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, sleep_total)  
+
+```
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, sleep_total) %>% 
+    filter(sleep_total >= 16)
+```
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, desc(sleep_total)) %>% 
+    filter(sleep_total >= 16)
+```
+
+## Creating new columns
+
+```{r}
+msleep %>% 
+    mutate(rem_proportion = sleep_rem / sleep_total)
+```
+
+```{r}
+msleep %>% 
+    mutate(rem_proportion = sleep_rem / sleep_total, 
+           bodywt_grams = bodywt * 1000)
+```
+
+## Summarise
+
+```{r}
+msleep %>% 
+    summarise(avg_sleep = mean(sleep_total))
+```
+
+```{r}
+msleep %>% 
+    summarise(avg_sleep = mean(sleep_total), 
+              min_sleep = min(sleep_total),
+              max_sleep = max(sleep_total),
+              total = n())
+```
+
+##Grouping
+
+```{r}
+msleep %>% 
+    group_by(order) %>%
+    summarise(avg_sleep = mean(sleep_total), 
+              min_sleep = min(sleep_total), 
+              max_sleep = max(sleep_total),
+              total = n())
+```
+

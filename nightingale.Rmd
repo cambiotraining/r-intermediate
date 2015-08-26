@@ -1,0 +1,49 @@
+---
+title: "Untitled"
+author: "Luke Skywalker"
+date: "26 August 2015"
+output: html_document
+---
+
+```{r}
+require(reshape)
+Night<- Nightingale[,c(1,8:10)]
+melted <- melt(Night, "Date")
+names(melted) <- c("Date", "Cause", "Deaths")
+melted$Cause <- sub("\\.rate", "", melted$Cause)
+melted$Regime <- ordered( rep(c(rep('Before', 12), rep('After', 12)), 3), 
+                          levels=c('Before', 'After'))
+Night <- melted
+
+# subsets, to facilitate separate plotting
+Night1 <- subset(Night, Date < as.Date("1855-04-01"))
+Night2 <- subset(Night, Date >= as.Date("1855-04-01"))
+
+# sort according to Deaths in decreasing order, so counts are not obscured [thx: Monique Graf]
+Night1 <- Night1[order(Night1$Deaths, decreasing=TRUE),]
+Night2 <- Night2[order(Night2$Deaths, decreasing=TRUE),]
+
+# merge the two sorted files
+Night <- rbind(Night1, Night2)
+```
+
+
+```{r}
+library(HistData)
+library(tidyr)
+data("Nightingale")
+Nightingale <- tbl_df(Nightingale)
+Nightingale<- 
+  Nightingale %>% 
+  select(c(Date, Disease.rate:Other.rate)) %>% 
+  gather(Date)
+colnames(Nightingale)[c(2,3)] <- c("Cause","Deaths")
+
+Nightingale <- Nightingale %>% transform(Date = ymd(as.character(Date)), Cause = sub("\\.rate", "", Cause))
+
+Nightingale <- Nightingale %>% transform(Regime = ifelse(Date < ymd("1855-04-01"), "Before","After"))
+
+Nightingale %>% arrange(desc(Regime),desc(Deaths))
+
+```
+
