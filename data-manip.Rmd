@@ -1,0 +1,429 @@
+---
+title: "Data Manipulation in R"
+author: "Mark Dunning"
+date: "27 August 2015"
+output: slidy_presentation
+---
+
+# Introduction to Data Manipulation with R
+
+## Motivation
+
+
+![tolstoy](images/tolstoy.jpg)
+
+
+
+![hadley](images/hadley.jpg)
+
+> Like families, tidy datasets are all alike but every messy dataset is messy in its own way - (Hadley Wickham)
+
+http://vimeo.com/33727555
+
+http://vita.had.co.nz/papers/tidy-data.pdf
+
+## Working with data frames
+
+## Tidy data principles
+
+Two guiding principles:
+
+- Each column is a variable
+- Each row is an observation
+
+However,
+
+- Un-tidy data are easier for humans to read
+- Tidy data are easier for computers to analyse
+
+    
+## Example (from tidyr paper)
+
+```{r echo=FALSE,results='asis'}
+library(knitr)
+untidy <- data.frame(Name = c("John Smith","Jane Doe","Mary Johnson"),treatmenta = c("-",16,3),treatmentb=c(2,11,1))
+kable(untidy)
+```
+
+http://vita.had.co.nz/papers/tidy-data.pdf
+
+## Re-arranging the data
+
+```{r echo=FALSE,results='asis'}
+untidy2 <- t(untidy)
+colnames(untidy2) <- untidy2[1,]
+untidy2 <- untidy2[-1,]
+kable(untidy2)
+```
+
+## Definitions
+
+- A dataset is made up of ***values***
+- Each value is associated with a ***variable** and an ***observation***
+    + variable contains all values that measure the same underlying variable
+    + an observation contains all values measured on the same unit
+- How many values, variables and observations do we have?
+
+## Answer
+
+- 18 values
+- 3 variables
+    + Person 
+    + Treatment
+    + Result
+- 6 observations
+
+## Tidy form of the data
+
+- We now have one column for each variable
+```{r echo=FALSE,warning=FALSE}
+library(tidyr)
+suppressPackageStartupMessages(library(dplyr))
+gather(untidy, Treatment, Result, treatmenta:treatmentb) %>% mutate(Treatment = gsub("treatment","",Treatment))
+```
+
+## The tidyr package
+
+- Two main functions
+    + `gather()` and `spread()`
+    
+## How to use gather
+
+
+
+```{r}
+untidy <- read.delim("tidyr-example.txt")
+untidy
+```
+
+## How to use gather
+
+- Creates a column of 'Treatment' keys
+    + the variables to use in the original data frame are treatmenta and treatmentb
+```{r warning=FALSE}
+gather(untidy, Treatment, Result, c(treatmenta,treatmentb))
+```
+
+
+
+## Example: Florence Nightingale data
+
+```{r results='asis',echo=FALSE}
+ngale <- read.delim("Nightingale.txt")
+library(knitr)
+kable(head(ngale))
+```
+
+- What variables and observations do we have?
+- What might a 'tidy' version of the dataset look like?
+
+## Tidy form
+
+```{r echo=FALSE, results='asis',message=FALSE}
+library(tidyr)
+ngale <- gather(ngale,Cause, Deaths, Disease:Other)
+```
+
+- Have a go at tidying these data
+    + "Nightingale.txt"
+    
+## Tidy solution
+
+```{r eval=FALSE}
+library(tidyr)
+ngale <- read.delim("Nightingale.txt")
+ngale <- gather(ngale,Cause, Deaths, Disease:Other)
+```
+
+## More data-cleaning tasks
+There are some tasks we might wish to perform before analysing the data
+
+- Extract year, month information from the date
+- Calculate death rates
+- Subset according to year
+
+## Introducing dplyr
+
+- dplyr is an all-purpose data wrangling tool
+- It introduces several 'verbs' that can be used to perform any data manipulation task
+    + select: select *columns*
+    + filter: select *rows*
+    + arrange: re-order arrange rows
+    + mutate: create new columns (variables)
+    + summarise: summarise values
+- Essential reference
+    + [dplyr cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+
+## Example
+
+```{r echo=FALSE}
+library(downloader)
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/msleep_ggplot2.csv"
+filename <- "msleep_ggplot2.csv"
+if (!file.exists(filename)) download(url,filename)
+```
+
+```{r}
+
+msleep <- read.csv("msleep_ggplot2.csv")
+head(msleep)
+```
+
+from:- [Rafa Irizarry and Michael Love](http://genomicsclass.github.io/book/pages/dplyr_tutorial.html)
+
+
+## Preliminary
+
+The `tbl_df` function in dplyr creates a new object with more-convenient default display
+
+- The object behaves in exactly the same way as a data frame
+
+```{r}
+library(dplyr)
+msleep <- tbl_df(msleep)
+msleep
+```
+
+## select
+
+
+```{r}
+select(msleep, name, sleep_total)
+```
+
+
+## omitting columns
+
+```{r}
+select(msleep, -name)
+```
+
+## selecting range of columns
+
+```{r}
+select(msleep, name:order)
+```
+
+## select, helper functions
+
+```{r}
+select(msleep, starts_with("sl"))
+```
+
+see also
+- contains, matches, ends_with
+
+## filter
+
+```{r}
+filter(msleep, sleep_total >= 16)
+```
+
+## filter
+```{r}
+filter(msleep, sleep_total >= 16, bodywt >= 1)
+```
+
+## filter
+
+```{r}
+filter(msleep, order %in% c("Perissodactyla", "Primates"))
+```
+
+## Combining operations
+
+```{r}
+msleep2 <- select(msleep, name, sleep_total)
+msleep2 <- filter(msleep2,sleep_total>16)
+msleep2
+```
+
+## Alternative code
+
+We could nest the expressions
+```{r}
+msleep2 <- filter(select(msleep,name,sleep_total),
+                  sleep_total>16)
+msleep2
+```
+
+## Introducing piping
+
+The output of one operations gets used as the input of the next
+
+In computing, this is referring to as *piping* 
+- unix commands use the `|` symbol
+
+## magrittr
+
+![not-a-pipe](images/pipe.jpeg)
+
+![also-not-a-pipe](https://upload.wikimedia.org/wikipedia/en/b/b9/MagrittePipe.jpg)
+
+- the magrittr library implements this in R
+
+
+
+## Simple example
+
+```{r}
+head(msleep)
+msleep %>% head
+```
+
+## Piplining our analysis so far
+
+- Read the csv
+- Convert to tbl_df
+- Select columns of interest
+```{r}
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
+      select(name, sleep_total)
+```
+
+## Adding extra steps
+
+```{r}
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
+      select(name, sleep_total) %>% 
+      filter(sleep_total > 16)
+```
+
+##arrange: order rows
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+  filter(sleep_total > 16) %>% 
+    arrange(sleep_total)  
+
+```
+
+##arrange: order rows
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+  filter(sleep_total > 16) %>% 
+    arrange(order, sleep_total)  
+
+```
+
+## descending order
+
+```{r}
+msleep %>% 
+    select(name, order, sleep_total) %>%
+    arrange(order, desc(sleep_total)) %>% 
+    filter(sleep_total >= 16)
+```
+
+## mutate: create new columns
+
+- Can use standard arithmetic operations
+
+```{r}
+msleep %>% 
+    mutate(rem_proportion = sleep_rem / sleep_total)
+```
+
+## mutate: create new columns
+
+- we can create more columns based on variables we just created
+
+```{r}
+msleep %>% 
+    mutate(rem_proportion = sleep_rem / sleep_total,
+           rem_percentage = rem_proportion*100)
+```
+
+## character manipulation
+
+```{r}
+mutate(msleep, vore=paste(vore,"vore",sep=""))
+```
+
+- or use `paste0` for the same effect
+
+## Trimming
+
+stringr by Hadley Wickham 
+```{r}
+library(stringr)
+mutate(msleep, name=str_sub(name,1,3))
+```
+
+## Padding
+
+- slightly silly in this case, but sometimes we have IDs that need to be a fixed width
+```{r}
+mutate(msleep, name=str_pad(name,width = 10,pad = "X",side = "right"))
+
+```
+
+
+## summarise
+
+```{r}
+msleep %>% 
+    summarise(avg_sleep = mean(sleep_total))
+```
+
+##Grouping
+
+summarise can be used in conjunction with a group-by operation
+
+```{r}
+msleep %>% 
+    group_by(order)
+
+```
+
+
+##Grouping
+
+```{r}
+msleep %>% 
+    group_by(order) %>%
+    summarise(avg_sleep = mean(sleep_total), 
+              min_sleep = min(sleep_total), 
+              max_sleep = max(sleep_total),
+              total = n())
+```
+
+## Exercise
+
+- Re-write the code to read and tidy the Nightingale data using tidyr and dplyr
+
+```{r}
+ngale <- read.delim("Nightingale.txt")
+ngale <- gather(ngale,Cause, Deaths, Disease:Other)
+```
+
+- Arrange the rows in the data so then are ordered by
+    + Date
+    + Cause of Death
+    
+
+## Solution
+
+```{r}
+ngale <- read.delim("Nightingale.txt") %>% 
+  tbl_df %>% 
+  gather(Cause, Deaths, Disease:Other) %>% 
+  arrange(Date, Cause)
+ngale
+```
+
+
+## References
+
+http://stat545-ubc.github.io/topics.html
+
+http://garrettgman.github.io/tidying/
+
+https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html
+
+http://kbroman.org/dataorg/

@@ -31,17 +31,20 @@ Night <- rbind(Night1, Night2)
 ```{r}
 library(HistData)
 library(tidyr)
+library(lubridate)
 data("Nightingale")
 Nightingale <- tbl_df(Nightingale)
+
+sub <- select(Nightingale, c(Date,Army,Disease,Wounds,Other))
+sub
+write.table(sub,file="Nightingale.txt",sep="\t",quote=FALSE)
 Nightingale<- 
   Nightingale %>% 
   select(c(Date, Disease.rate:Other.rate)) %>% 
-  gather(Date)
-colnames(Nightingale)[c(2,3)] <- c("Cause","Deaths")
+  gather(Cause,Deaths,-Date) %>% 
+  transform(Date = ymd(as.character(Date)),Cause=sub("\\.rate", "", Cause)) %>% 
+  transform(Regime =ifelse(Date < ymd("1855-04-01"), "Before","After"))
 
-Nightingale <- Nightingale %>% transform(Date = ymd(as.character(Date)), Cause = sub("\\.rate", "", Cause))
-
-Nightingale <- Nightingale %>% transform(Regime = ifelse(Date < ymd("1855-04-01"), "Before","After"))
 
 Nightingale %>% arrange(desc(Regime),desc(Deaths))
 
