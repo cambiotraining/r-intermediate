@@ -135,6 +135,16 @@ ngale <- read.delim("Nightingale.txt")
 ngale <- gather(ngale,Cause, Deaths, Disease:Other)
 ```
 
+## Spread
+
+- spread has the opposite effect to gather and will translate tidy data back into human-readable form
+
+```{r}
+
+spread(ngale, Cause,Deaths)
+```
+
+
 ## More data-cleaning tasks
 There are some tasks we might wish to perform before analysing the data
 
@@ -369,7 +379,7 @@ stringr by Hadley Wickham
 library(stringr)
 read.csv("msleep_ggplot2.csv") %>% 
       tbl_df %>% 
-mutate(name=str_sub(name,1,3))
+mutate(name=str_sub(name,1,3),genus = str_sub(genus,1,3))
 ```
 
 ## Padding
@@ -455,7 +465,7 @@ ngale %>% mutate(Rate = round(12 * 1000 * Deaths /Army,1))
 
 Extract month / year information
 
-```{r}
+```{r echo=FALSE}
 library(lubridate)
 ngale %>% mutate(Date = ymd(Date),Year = year(Date), Month = month.abb[month(Date)])
 ```
@@ -464,9 +474,10 @@ ngale %>% mutate(Date = ymd(Date),Year = year(Date), Month = month.abb[month(Dat
 
 - Which dates are after the change of regime?
 
-```{r}
+```{r echo=FALSE}
 ngale %>% 
   mutate(Date = ymd(Date),Year = year(Date)) %>% 
+  mutate(Date = ymd(Date),Year = year(Date), Month = month.abb[month(Date)]) %>% 
   mutate(Regime = ifelse(Date > ymd("1855-03-01"), "After","Before"))
 
 ```
