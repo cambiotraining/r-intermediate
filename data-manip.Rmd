@@ -276,8 +276,19 @@ msleep %>% head
 - Read the csv
 - Convert to tbl_df
 - Select columns of interest
+    + Notice how the `msleep` variable gets passed from one line to another
+
 ```{r}
-read.csv("msleep_ggplot2.csv") %>% 
+msleep <- read.csv("msleep_ggplot2.csv")
+msleep <- tbl_df(msleep)
+msleep <- select(msleep, name,sleep_total)
+```
+
+
+## Re-write with 'pipes'
+
+```{r}
+msleep <- read.csv("msleep_ggplot2.csv") %>% 
       tbl_df %>% 
       select(name, sleep_total)
 ```
@@ -285,8 +296,7 @@ read.csv("msleep_ggplot2.csv") %>%
 ## Adding extra steps
 
 ```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
+msleep %>% 
       select(name, sleep_total) %>% 
       filter(sleep_total > 16)
 ```
@@ -295,7 +305,6 @@ read.csv("msleep_ggplot2.csv") %>%
 
 ```{r}
 msleep %>% 
-    select(name, order, sleep_total) %>%
   filter(sleep_total > 16) %>% 
     arrange(sleep_total)  
 
@@ -304,7 +313,8 @@ msleep %>%
 ##arrange: order rows
 
 ```{r}
-msleep %>% 
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
     select(name, order, sleep_total) %>%
   filter(sleep_total > 16) %>% 
     arrange(order, sleep_total)  
@@ -314,7 +324,8 @@ msleep %>%
 ## descending order
 
 ```{r}
-msleep %>% 
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
     select(name, order, sleep_total) %>%
     arrange(order, desc(sleep_total)) %>% 
     filter(sleep_total >= 16)
@@ -325,7 +336,8 @@ msleep %>%
 - Can use standard arithmetic operations
 
 ```{r}
-msleep %>% 
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
     mutate(rem_proportion = sleep_rem / sleep_total)
 ```
 
@@ -334,7 +346,8 @@ msleep %>%
 - we can create more columns based on variables we just created
 
 ```{r}
-msleep %>% 
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
     mutate(rem_proportion = sleep_rem / sleep_total,
            rem_percentage = rem_proportion*100)
 ```
@@ -342,7 +355,9 @@ msleep %>%
 ## character manipulation
 
 ```{r}
-mutate(msleep, vore=paste(vore,"vore",sep=""))
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
+      mutate(vore=paste(vore,"vore",sep=""))
 ```
 
 - or use `paste0` for the same effect
@@ -352,19 +367,29 @@ mutate(msleep, vore=paste(vore,"vore",sep=""))
 stringr by Hadley Wickham 
 ```{r}
 library(stringr)
-mutate(msleep, name=str_sub(name,1,3))
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
+mutate(name=str_sub(name,1,3))
 ```
 
 ## Padding
 
 - slightly silly in this case, but sometimes we have IDs that need to be a fixed width
 ```{r}
-mutate(msleep, name=str_pad(name,width = 10,pad = "X",side = "right"))
+read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df %>% 
+mutate( name=str_pad(name,width = 10,pad = "X",side = "right"))
 
 ```
 
 
 ## summarise
+
+```{r echo=FALSE}
+msleep <- read.csv("msleep_ggplot2.csv") %>% 
+      tbl_df
+```
+
 
 ```{r}
 msleep %>% 
@@ -410,11 +435,40 @@ ngale <- gather(ngale,Cause, Deaths, Disease:Other)
 ## Solution
 
 ```{r}
-ngale <- read.delim("Nightingale.txt") %>% 
+ngale <- read.delim("Nightingale.txt") %>%  
   tbl_df %>% 
-  gather(Cause, Deaths, Disease:Other) %>% 
+  gather(Cause, Deaths, Disease:Other) %>%  
   arrange(Date, Cause)
 ngale
+```
+
+
+## Exercise
+
+- Add a new Rate column
+
+```{r echo=FALSE}
+ngale %>% mutate(Rate = round(12 * 1000 * Deaths /Army,1))
+```
+
+## Exercise
+
+Extract month / year information
+
+```{r}
+library(lubridate)
+ngale %>% mutate(Date = ymd(Date),Year = year(Date), Month = month.abb[month(Date)])
+```
+
+## Exercise
+
+- Which dates are after the change of regime?
+
+```{r}
+ngale %>% 
+  mutate(Date = ymd(Date),Year = year(Date)) %>% 
+  mutate(Regime = ifelse(Date > ymd("1855-03-01"), "After","Before"))
+
 ```
 
 

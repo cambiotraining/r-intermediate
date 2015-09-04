@@ -37,7 +37,7 @@ Nightingale <- tbl_df(Nightingale)
 
 sub <- select(Nightingale, c(Date,Army,Disease,Wounds,Other))
 sub
-write.table(sub,file="Nightingale.txt",sep="\t",quote=FALSE)
+write.table(as.data.frame(sub),file="Nightingale.txt",sep="\t",quote=FALSE)
 Nightingale<- 
   Nightingale %>% 
   select(c(Date, Disease.rate:Other.rate)) %>% 
