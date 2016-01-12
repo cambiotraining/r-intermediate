@@ -1,8 +1,8 @@
 ---
 title: "Data Manipulation in R"
 author: "Mark Dunning"
-date: "27 August 2015"
-output: slidy_presentation
+date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
+output: html_document
 ---
 
 # Introduction to Data Manipulation with R

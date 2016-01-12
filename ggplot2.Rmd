@@ -1,0 +1,190 @@
+---
+title: "ggplot2"
+author: "Mark Dunning"
+date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
+---
+
+
+
+# Before we start...
+
+```{r eval=FALSE,echo=FALSE}
+## making sure we have XKCD fonts
+library(extrafont)
+download.file("http://simonsoftware.se/other/xkcd.ttf",
+  dest="xkcd.ttf", mode="wb")
+system("mkdir ~/.fonts")
+system("cp xkcd.ttf ~/.fonts")
+font_import(pattern = "[X/x]kcd", prompt=FALSE)
+fonts()
+fonttable()
+if(.Platform$OS.type != "unix") {
+## Register fonts for Windows bitmap output
+loadfonts(device="win")
+} else {
+loadfonts()
+}
+```
+
+
+## What is it that you want to plot?
+
+ref Course from [Babraham Bioinformatics](http://www.bioinformatics.babraham.ac.uk/training.html#figuredesign)
+
+### and what is the appropriate graph?
+
+A relationship?
+
+```{r echo=FALSE,message=FALSE}
+ xrange <- range(mtcars$mpg)
+ yrange <- range(mtcars$wt)
+library(xkcd)
+p <- ggplot() + geom_point(aes(mpg, wt), data=mtcars) + 
+       xkcdaxis(xrange,yrange)
+ p
+
+```
+
+A trend?
+
+```{r warning=FALSE,message=FALSE,echo=FALSE}
+  volunteers <- data.frame(year=c(2007:2011), 
+                          number=c(56470, 56998, 59686, 61783, 64251))
+xrange <- range(volunteers$year)
+ yrange <- range(volunteers$number)
+ ratioxy <-  diff(xrange) / diff(yrange)
+ 
+ datalines <- data.frame(xbegin=c(2008.3,2010.5),ybegin=c(63000,59600), 
+                         xend=c(2008.5,2010.3), yend=c(63400,59000))
+ p <- ggplot() + geom_smooth(mapping=aes(x=year, y =number), 
+                             data =volunteers, method="loess") +
+   xkcdaxis(xrange,yrange) +
+   ylab("Volunteers at Caritas Spain") 
+ p 
+```
+
+Count data?
+
+```{r echo=FALSE,message=FALSE}
+ data <- volunteers
+ data$xmin <- data$year - 0.1
+ data$xmax <- data$year + 0.1
+ data$ymin <- 50000
+ data$ymax <- data$number
+ xrange <- range(min(data$xmin)-0.1, max(data$xmax) + 0.1)
+ yrange <- range(min(data$ymin)+500, max(data$ymax) + 1000)
+ 
+ mapping <- aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax)
+ p <- ggplot() + xkcdrect(mapping,data) + 
+   xkcdaxis(xrange,yrange) +
+   xlab("Year") + ylab("Volunteers at Caritas Spain")
+ p
+```
+
+## Final warning
+
+Stop and make sure you're not about to do something [silly](http://www.businessinsider.com/the-27-worst-charts-of-all-time-2013-6?op=1&IR=T)
+
+# Introduction to the ggplot2 package
+
+- Base graphics in R use a canvas model
+    + series of instructions that sequentially fill the plotting canvas
+    
+- ggplot2 employs a `grammar of graphics approach`
+- The components are
+    + a dataset
+    + geometric object that is visual representation of the data
+        + e.g. points, lines, etc
+    + mapping of variables to visual properties of plot
+        + ***aesthetics***
+    + statistical summarisation rule
+    + coordinate system
+    + facet specification
+- ggplot2 makes it easier to produce high-quality plots from the data. Thus, leaving you with more free time to explore the data rather than customising the plot
+- For a good overview of the package, see the ggplot2 [cheat-sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+- ggplot2 shares the *tidy data* philosphy of `tidyr` and `dplyr`
+    + 
+
+## Plot Comparison
+
+```{r fig.height=3}
+x <- 1:10
+y <- 2*x
+plot(x,y)
+```
+
+```{r fig.height=3}
+library(ggplot2)
+df <-data.frame(x,y)
+ggplot(df, aes(x=x,y=y)) + geom_point()
+
+```
+
+Lets break-down how the ggplot was constructed
+
+- We create a *data frame*
+- Map the variables `x` and `y` in the data frame to the x and y aesthetics of the plot
+- call the `ggplot` function
+
+As an experiment, let's try the following
+```{r eval=FALSE}
+library(ggplot2)
+df <-data.frame(x,y)
+ggplot(df, aes(x=x,y=y))
+
+```
+
+You probably see an error message and no plot is displayed. This is because we haven't defined how are data are to be represented on the plot. In other words, we need to define how the aesthetics are arranged *geom*etricly on the canvas.
+
+```{r echo=FALSE}
+message("Error: No layers in plot")
+```
+
+We choose the `geom_point` arrangement
+
+```{r}
+ggplot(df, aes(x=x,y=y)) + geom_point()
+```
+
+
+## Data formats
+ 
+- ggplot2 needs data as a data frame
+- It needs to be ***long*** format
+
+```{r}
+library(tidyr)
+df <- data.frame(A = rnorm(5,3), B=rnorm(5,1))
+df[1:3,]
+df2 <- gather(df)
+df2
+```
+
+This time our `x` variable is *discrete*. A boxplot is appropriate. 
+
+```{r}
+ggplot(df2, aes(x = key,y=value)) + geom_boxplot()
+```
+
+
+## Plot construction
+
+```{r fig.height=3}
+ggplot(df2, aes(x = key,y=value,fill=key)) + geom_boxplot()
+```
+
+## Updating a plot
+
+- ggplot2 will easily re-drawn a plot as new variables are added
+    + a real advantage!
+```{r fig.height=3}
+df <- data.frame(A = rnorm(5,3), B=rnorm(5,1),C=rnorm(5,2))
+df2 <- gather(df)
+ggplot(df2, aes(x = key,y=value,fill=key)) + geom_boxplot()
+```
+
+
+```{r echo=FALSE,message=FALSE,warning=FALSE}
+library(RXKCD)
+p <-getXKCD("833",display = TRUE,html = FALSE)
+```
