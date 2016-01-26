@@ -11,3 +11,6 @@ Topics
 NOTES
 
 Use Florence Nightingale dataset from HistData package
+
+A great tutorial on ggplot2
+http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html
