@@ -10,4 +10,10 @@ Topics
 
 NOTES
 
-Use Florence Nightingale dataset from HistData package
+- Use Florence Nightingale dataset from HistData package?
+- Or an example from UsingR
+- Tutorials on dplyr
+    + https://www.udacity.com/wiki/ud651
+    + http://stat545-ubc.github.io/index.html
+    + http://kbroman.org/dataorg/
+    + http://genomicsclass.github.io/book/pages/dplyr_tutorial.html
