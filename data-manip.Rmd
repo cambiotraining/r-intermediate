@@ -166,58 +166,91 @@ There are some tasks we might wish to perform before analysing the data
 
 ## Example
 
-```{r echo=FALSE}
-library(downloader)
-url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/msleep_ggplot2.csv"
-filename <- "msleep_ggplot2.csv"
-if (!file.exists(filename)) download(url,filename)
-```
+We are going to explore some of the basic features of R using some patient data; the kind of data that we might encounter in the wild. However, rather than using real-life data we are going to make some up. There is a package called `wakefield` that is particularly convenient for this task.
+
+Various patient characteristics can be generated. The following is a function that uses the package to create a *data frame* with various clinical characteristics. The number of patients we want to simulate is an argument.
+
+Don't worry about what the function does, you can just paste the following into the R console, 
+
 
 ```{r}
-
-msleep <- read.csv("msleep_ggplot2.csv")
-head(msleep)
+library(wakefield)
+random_patients <- function(n) {
+  r_data_frame(
+    n,
+    id,
+    name,
+    race,
+    sex,
+    smokes,
+    height,
+    birth(random = TRUE, x = NULL, start = Sys.Date() - 365 * 45, k = 365*2,by = "1 days"),
+    state,
+    pet,
+    grade_level(x=1:3),
+    died,    
+    normal(name="Count"),
+    date_stamp)
+}
 ```
 
-from:- [Rafa Irizarry and Michael Love](http://genomicsclass.github.io/book/pages/dplyr_tutorial.html)
+We can now use the `random_patients` function to generate a data frame of 250 fictitious patients
+
+```{r}
+patients <- random_patients(250)
+```
+
+In Rstudio , you can view the contents of this data frame in a tab.
+
+```{r eval=FALSE}
+View(patients)
+```
+
+******
+
+## Q. What are the dimensions of the data frame?
+
+## Q. What columns are available?
+
+******
+
+`patients` is a special kind of data frame. The main difference is that the whole data frame does not get printed to screen
+
+```{r}
+patients
+```
 
 
-## Preliminary
 
 The `tbl_df` function in dplyr creates a new object with more-convenient default display
 
 - The object behaves in exactly the same way as a data frame
 
-```{r}
-library(dplyr)
-msleep <- tbl_df(msleep)
-msleep
-```
 
 ## select
 
 
 ```{r}
-select(msleep, name, sleep_total)
+select(patients, Name, Race)
 ```
 
 
 ## omitting columns
 
 ```{r}
-select(msleep, -name)
+select(patients, -Name)
 ```
 
 ## selecting range of columns
 
 ```{r}
-select(msleep, name:order)
+select(patients, Name:Sex)
 ```
 
 ## select, helper functions
 
 ```{r}
-select(msleep, starts_with("sl"))
+select(patients, starts_with("Grade"))
 ```
 
 see also
@@ -226,35 +259,35 @@ see also
 ## filter
 
 ```{r}
-filter(msleep, sleep_total >= 16)
+filter(patients, Count >= 1.5)
 ```
 
 ## filter
 ```{r}
-filter(msleep, sleep_total >= 16, bodywt >= 1)
+filter(patients, Count >= 1.5, Died)
 ```
 
 ## filter
 
 ```{r}
-filter(msleep, order %in% c("Perissodactyla", "Primates"))
+filter(patients, Pet %in% c("Cat", "Dog"))
 ```
 
 ## Combining operations
 
 ```{r}
-msleep2 <- select(msleep, name, sleep_total)
-msleep2 <- filter(msleep2,sleep_total>16)
-msleep2
+patients <- select(patients, Name, Count,Died)
+patients2 <- filter(patients,Count>1.5,Died)
+patients2
 ```
 
 ## Alternative code
 
 We could nest the expressions
 ```{r}
-msleep2 <- filter(select(msleep,name,sleep_total),
-                  sleep_total>16)
-msleep2
+patients2 <- filter(select(patients,Name, Count,Died),
+                  Count>1.5,Died)
+patients2
 ```
 
 ## Introducing piping
@@ -277,68 +310,41 @@ In computing, this is referring to as *piping*
 ## Simple example
 
 ```{r}
-head(msleep)
-msleep %>% head
+head(patients)
+patients %>% head
 ```
 
-## Piplining our analysis so far
-
-- Read the csv
-- Convert to tbl_df
-- Select columns of interest
-    + Notice how the `msleep` variable gets passed from one line to another
-
-```{r}
-msleep <- read.csv("msleep_ggplot2.csv")
-msleep <- tbl_df(msleep)
-msleep <- select(msleep, name,sleep_total)
-```
 
 
 ## Re-write with 'pipes'
 
 ```{r}
-msleep <- read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-      select(name, sleep_total)
+patients <- random_patients(250) %>% 
+      select(Name, Count,Died) %>% 
+      filter(Count>1.5,Died)
+patients
 ```
 
-## Adding extra steps
-
-```{r}
-msleep %>% 
-      select(name, sleep_total) %>% 
-      filter(sleep_total > 16)
-```
 
 ##arrange: order rows
 
 ```{r}
-msleep %>% 
-  filter(sleep_total > 16) %>% 
-    arrange(sleep_total)  
-
+patients <- random_patients(250) %>% 
+      select(Name, Count,Died) %>% 
+      filter(Count>1.5,Died) %>% 
+      arrange(Count)
+patients
 ```
 
-##arrange: order rows
-
-```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-    select(name, order, sleep_total) %>%
-  filter(sleep_total > 16) %>% 
-    arrange(order, sleep_total)  
-
-```
 
 ## descending order
 
 ```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-    select(name, order, sleep_total) %>%
-    arrange(order, desc(sleep_total)) %>% 
-    filter(sleep_total >= 16)
+patients <- random_patients(250) %>% 
+      select(Name, Count,Died) %>% 
+      filter(Count>1.5,Died) %>% 
+      arrange(desc(Count))
+patients
 ```
 
 ## mutate: create new columns
@@ -346,64 +352,24 @@ read.csv("msleep_ggplot2.csv") %>%
 - Can use standard arithmetic operations
 
 ```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-    mutate(rem_proportion = sleep_rem / sleep_total)
+random_patients(250) %>% 
+  mutate(Rank = rank(Count))
 ```
 
-## mutate: create new columns
-
-- we can create more columns based on variables we just created
-
-```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-    mutate(rem_proportion = sleep_rem / sleep_total,
-           rem_percentage = rem_proportion*100)
-```
 
 ## character manipulation
 
 ```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-      mutate(vore=paste(vore,"vore",sep=""))
-```
-
-- or use `paste0` for the same effect
-
-## Trimming
-
-stringr by Hadley Wickham 
-```{r}
 library(stringr)
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-mutate(name=str_sub(name,1,3),genus = str_sub(genus,1,3))
+random_patients(250) %>% 
+      mutate(Abrv=str_sub(State,1,3))
 ```
 
-## Padding
-
-- slightly silly in this case, but sometimes we have IDs that need to be a fixed width
-```{r}
-read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df %>% 
-mutate( name=str_pad(name,width = 10,pad = "X",side = "right"))
-
-```
-
-
-## summarise
-
-```{r echo=FALSE}
-msleep <- read.csv("msleep_ggplot2.csv") %>% 
-      tbl_df
-```
 
 
 ```{r}
-msleep %>% 
-    summarise(avg_sleep = mean(sleep_total))
+random_patients(250) %>% 
+    summarise(avg_cnt = mean(Count))
 ```
 
 ##Grouping
@@ -411,22 +377,13 @@ msleep %>%
 summarise can be used in conjunction with a group-by operation
 
 ```{r}
-msleep %>% 
-    group_by(order)
-
-```
-
-
-##Grouping
-
-```{r}
-msleep %>% 
-    group_by(order) %>%
-    summarise(avg_sleep = mean(sleep_total), 
-              min_sleep = min(sleep_total), 
-              max_sleep = max(sleep_total),
+random_patients(250) %>% 
+    group_by(Died) %>% 
+    summarise(avg_count = mean(Count),
+              sd_count = sd(Count),
               total = n())
 ```
+
 
 ## Exercise
 
