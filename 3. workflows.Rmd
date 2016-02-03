@@ -1,0 +1,89 @@
+---
+title: "Towards Analysis Workflows in R"
+author: "Mark Dunning"
+date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
+output: html_document
+---
+
+
+```{r echo=FALSE}
+suppressPackageStartupMessages(library(dplyr))
+library(stringr)
+library(tidyr)
+patients <- tbl_df(read.delim("patient-data.txt"))
+```
+
+
+## Introducing piping
+
+The output of one operations gets used as the input of the next
+
+In computing, this is referring to as *piping* 
+- unix commands use the `|` symbol
+
+## magrittr
+
+![not-a-pipe](images/pipe.jpeg)
+
+![also-not-a-pipe](https://upload.wikimedia.org/wikipedia/en/b/b9/MagrittePipe.jpg)
+
+- the magrittr library implements this in R
+
+## Why do we need this?
+
+We've ended up with a long chain of commands
+
+```{r}
+
+patients_clean<- mutate(patients, Sex = factor(str_trim(Sex)))
+patients_clean <- mutate(patients_clean, ID=str_pad(patients_clean$ID,pad = "0",width=3))
+patients_clean <- mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
+```
+
+
+## Simple example
+
+```{r eval=FALSE}
+patients <- read.delim("patient-data.txt")
+head(patients)
+
+patients %>% head
+
+```
+
+We can re-write our steps from above;
+
+```{r}
+patients_clean <-
+  mutate(patients, Sex = factor(str_trim(Sex))) %>% 
+  mutate(ID=str_pad(ID,pad = "0",width=3)) %>% 
+  mutate(Height= str_replace_all(Height,pattern = "cm",""))
+patients_clean
+```
+
+
+
+## Exercise
+
+- Re-write the code to read and tidy the Nightingale data using tidyr and dplyr
+
+```{r}
+ngale <- read.delim("Nightingale.txt")
+ngale <- gather(ngale,Cause, Deaths, Disease:Other)
+```
+
+- Arrange the rows in the data so then are ordered by
+    + Date
+    + Cause of Death
+    
+
+## Solution
+
+```{r}
+ngale <- read.delim("Nightingale.txt") %>%  
+  tbl_df %>% 
+  gather(Cause, Deaths, Disease:Other) 
+ngale
+```
+
+
