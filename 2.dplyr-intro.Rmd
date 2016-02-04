@@ -310,13 +310,15 @@ year(patients$Birth)
 ```
 
 
-```{r eval=FALSE}
+```{r}
 
 dob <- ymd(patients$Birth)
 today <- ymd("20160203")
-age <- new_interval(dob, today) / years(1)
-mutate(patients, Age = new_interval(dob, today) / years(1))
+age <- interval(dob, today) 
+as.period(age)
 
+patients_clean <- mutate(patients_clean, Age = year(as.period(age)))
+patients_clean
 ```
 
 ******

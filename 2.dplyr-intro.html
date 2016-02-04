@@ -892,8 +892,62 @@ year(patients$Birth)</code></pre>
 ##  [99] 1971 1971</code></pre>
 <pre class="r"><code>dob &lt;- ymd(patients$Birth)
 today &lt;- ymd(&quot;20160203&quot;)
-age &lt;- new_interval(dob, today) / years(1)
-mutate(patients, Age = new_interval(dob, today) / years(1))</code></pre>
+age &lt;- interval(dob, today) 
+as.period(age)</code></pre>
+<pre><code>##   [1] &quot;43y 11m 23d 0H 0M 0S&quot; &quot;43y 6m 12d 0H 0M 0S&quot;  &quot;44y 2m 11d 0H 0M 0S&quot; 
+##   [4] &quot;44y 4m 0d 0H 0M 0S&quot;   &quot;43y 2m 11d 0H 0M 0S&quot;  &quot;43y 6m 4d 0H 0M 0S&quot;  
+##   [7] &quot;44y 2m 21d 0H 0M 0S&quot;  &quot;43y 10m 20d 0H 0M 0S&quot; &quot;43y 3m 24d 0H 0M 0S&quot; 
+##  [10] &quot;43y 11m 6d 0H 0M 0S&quot;  &quot;44y 10m 1d 0H 0M 0S&quot;  &quot;44y 0m 9d 0H 0M 0S&quot;  
+##  [13] &quot;43y 7m 26d 0H 0M 0S&quot;  &quot;43y 9m 25d 0H 0M 0S&quot;  &quot;44y 2m 29d 0H 0M 0S&quot; 
+##  [16] &quot;43y 5m 19d 0H 0M 0S&quot;  &quot;44y 3m 11d 0H 0M 0S&quot;  &quot;43y 3m 19d 0H 0M 0S&quot; 
+##  [19] &quot;43y 9m 1d 0H 0M 0S&quot;   &quot;43y 11m 22d 0H 0M 0S&quot; &quot;44y 11m 1d 0H 0M 0S&quot; 
+##  [22] &quot;44y 0m 0d 0H 0M 0S&quot;   &quot;43y 3m 13d 0H 0M 0S&quot;  &quot;44y 9m 9d 0H 0M 0S&quot;  
+##  [25] &quot;43y 8m 16d 0H 0M 0S&quot;  &quot;44y 2m 16d 0H 0M 0S&quot;  &quot;44y 8m 28d 0H 0M 0S&quot; 
+##  [28] &quot;44y 8m 17d 0H 0M 0S&quot;  &quot;43y 9m 0d 0H 0M 0S&quot;   &quot;43y 3m 16d 0H 0M 0S&quot; 
+##  [31] &quot;44y 9m 25d 0H 0M 0S&quot;  &quot;44y 10m 23d 0H 0M 0S&quot; &quot;43y 2m 13d 0H 0M 0S&quot; 
+##  [34] &quot;44y 4m 22d 0H 0M 0S&quot;  &quot;44y 4m 7d 0H 0M 0S&quot;   &quot;44y 11m 6d 0H 0M 0S&quot; 
+##  [37] &quot;43y 9m 17d 0H 0M 0S&quot;  &quot;43y 3m 5d 0H 0M 0S&quot;   &quot;43y 4m 25d 0H 0M 0S&quot; 
+##  [40] &quot;43y 10m 8d 0H 0M 0S&quot;  &quot;44y 0m 13d 0H 0M 0S&quot;  &quot;43y 6m 19d 0H 0M 0S&quot; 
+##  [43] &quot;44y 4m 1d 0H 0M 0S&quot;   &quot;43y 3m 21d 0H 0M 0S&quot;  &quot;44y 5m 23d 0H 0M 0S&quot; 
+##  [46] &quot;44y 10m 5d 0H 0M 0S&quot;  &quot;43y 3m 19d 0H 0M 0S&quot;  &quot;43y 10m 24d 0H 0M 0S&quot;
+##  [49] &quot;44y 4m 23d 0H 0M 0S&quot;  &quot;44y 0m 11d 0H 0M 0S&quot;  &quot;44y 0m 20d 0H 0M 0S&quot; 
+##  [52] &quot;44y 1m 2d 0H 0M 0S&quot;   &quot;44y 3m 25d 0H 0M 0S&quot;  &quot;43y 5m 29d 0H 0M 0S&quot; 
+##  [55] &quot;43y 7m 30d 0H 0M 0S&quot;  &quot;43y 4m 17d 0H 0M 0S&quot;  &quot;43y 7m 14d 0H 0M 0S&quot; 
+##  [58] &quot;43y 3m 2d 0H 0M 0S&quot;   &quot;43y 1m 2d 0H 0M 0S&quot;   &quot;42y 11m 22d 0H 0M 0S&quot;
+##  [61] &quot;44y 6m 2d 0H 0M 0S&quot;   &quot;43y 10m 0d 0H 0M 0S&quot;  &quot;43y 7m 9d 0H 0M 0S&quot;  
+##  [64] &quot;43y 1m 30d 0H 0M 0S&quot;  &quot;44y 3m 8d 0H 0M 0S&quot;   &quot;43y 7m 29d 0H 0M 0S&quot; 
+##  [67] &quot;44y 3m 11d 0H 0M 0S&quot;  &quot;44y 10m 19d 0H 0M 0S&quot; &quot;44y 2m 7d 0H 0M 0S&quot;  
+##  [70] &quot;43y 6m 24d 0H 0M 0S&quot;  &quot;44y 10m 2d 0H 0M 0S&quot;  &quot;43y 11m 22d 0H 0M 0S&quot;
+##  [73] &quot;43y 9m 11d 0H 0M 0S&quot;  &quot;43y 0m 13d 0H 0M 0S&quot;  &quot;44y 1m 23d 0H 0M 0S&quot; 
+##  [76] &quot;44y 0m 11d 0H 0M 0S&quot;  &quot;43y 0m 11d 0H 0M 0S&quot;  &quot;44y 4m 16d 0H 0M 0S&quot; 
+##  [79] &quot;44y 0m 24d 0H 0M 0S&quot;  &quot;43y 4m 6d 0H 0M 0S&quot;   &quot;43y 11m 5d 0H 0M 0S&quot; 
+##  [82] &quot;44y 7m 9d 0H 0M 0S&quot;   &quot;44y 0m 8d 0H 0M 0S&quot;   &quot;43y 1m 15d 0H 0M 0S&quot; 
+##  [85] &quot;44y 10m 25d 0H 0M 0S&quot; &quot;43y 8m 29d 0H 0M 0S&quot;  &quot;43y 9m 5d 0H 0M 0S&quot;  
+##  [88] &quot;44y 4m 23d 0H 0M 0S&quot;  &quot;44y 9m 23d 0H 0M 0S&quot;  &quot;44y 1m 4d 0H 0M 0S&quot;  
+##  [91] &quot;43y 7m 26d 0H 0M 0S&quot;  &quot;43y 3m 23d 0H 0M 0S&quot;  &quot;44y 7m 22d 0H 0M 0S&quot; 
+##  [94] &quot;43y 2m 11d 0H 0M 0S&quot;  &quot;43y 5m 28d 0H 0M 0S&quot;  &quot;44y 6m 19d 0H 0M 0S&quot; 
+##  [97] &quot;44y 10m 18d 0H 0M 0S&quot; &quot;43y 4m 16d 0H 0M 0S&quot;  &quot;44y 1m 12d 0H 0M 0S&quot; 
+## [100] &quot;44y 2m 11d 0H 0M 0S&quot;</code></pre>
+<pre class="r"><code>patients_clean &lt;- mutate(patients_clean, Age = year(as.period(age)))
+patients_clean</code></pre>
+<pre><code>## Source: local data frame [100 x 16]
+## 
+##       ID      Name     Race   Age    Sex Smokes   Height
+##    (chr)    (fctr)   (fctr) (dbl) (fctr) (fctr)    (dbl)
+## 1    001 Demetrius    White    43   Male   TRUE 176.4791
+## 2    002   Rosario    White    43   Male   TRUE 174.7485
+## 3    003     Julio    Black    44   Male     No 173.9449
+## 4    004      Lupe    White    44   Male  FALSE 180.0289
+## 5    005    Lavern      Cat    43   Male     No 178.6365
+## 6    006    Bernie   Native    43 Female  FALSE 159.7778
+## 7    007    Samuel    White    44   Male   TRUE 170.9500
+## 8    008     Clair    White    43 Female   TRUE 161.8266
+## 9    009   Shirley    White    43   Male  FALSE 169.6623
+## 10   010     Merle Hispanic    43 Female  FALSE 160.1210
+## ..   ...       ...      ...   ...    ...    ...      ...
+## Variables not shown: Weight (fctr), Birth (fctr), State (fctr), Pet
+##   (fctr), Grade_Level (int), Died (lgl), Count (dbl), Date (fctr), Grade
+##   (int)</code></pre>
 <hr />
 </div>
 <div id="exercise" class="section level2">
@@ -913,17 +967,17 @@ mutate(patients, Age = new_interval(dob, today) / years(1))</code></pre>
 <pre><code>## Source: local data frame [100 x 19]
 ## 
 ##       ID      Name     Race   Age    Sex Smokes   Height   Weight
-##    (chr)    (fctr)   (fctr) (int) (fctr)  (lgl)    (dbl)    (dbl)
-## 1    001 Demetrius    White    22   Male   TRUE 176.4791 77.07070
-## 2    002   Rosario    White    25   Male   TRUE 174.7485 83.26835
-## 3    003     Julio    Black    20   Male  FALSE 173.9449 85.63231
-## 4    004      Lupe    White    26   Male  FALSE 180.0289 88.72032
-## 5    005    Lavern      Cat    35   Male  FALSE 178.6365 97.05405
-## 6    006    Bernie   Native    30 Female  FALSE 159.7778 68.31247
-## 7    007    Samuel    White    32   Male   TRUE 170.9500 95.65815
-## 8    008     Clair    White    29 Female   TRUE 161.8266 66.02854
-## 9    009   Shirley    White    22   Male  FALSE 169.6623 77.29546
-## 10   010     Merle Hispanic    26 Female  FALSE 160.1210 69.59613
+##    (chr)    (fctr)   (fctr) (dbl) (fctr)  (lgl)    (dbl)    (dbl)
+## 1    001 Demetrius    White    43   Male   TRUE 176.4791 77.07070
+## 2    002   Rosario    White    43   Male   TRUE 174.7485 83.26835
+## 3    003     Julio    Black    44   Male  FALSE 173.9449 85.63231
+## 4    004      Lupe    White    44   Male  FALSE 180.0289 88.72032
+## 5    005    Lavern      Cat    43   Male  FALSE 178.6365 97.05405
+## 6    006    Bernie   Native    43 Female  FALSE 159.7778 68.31247
+## 7    007    Samuel    White    44   Male   TRUE 170.9500 95.65815
+## 8    008     Clair    White    43 Female   TRUE 161.8266 66.02854
+## 9    009   Shirley    White    43   Male  FALSE 169.6623 77.29546
+## 10   010     Merle Hispanic    43 Female  FALSE 160.1210 69.59613
 ## ..   ...       ...      ...   ...    ...    ...      ...      ...
 ## Variables not shown: Birth (fctr), State (fctr), Pet (fctr), Grade_Level
 ##   (int), Died (lgl), Count (dbl), Date (fctr), Grade (int), BMI (dbl),

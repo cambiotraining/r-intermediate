@@ -7,10 +7,10 @@ It has been said that 80% of data analysis is spent on the process of cleaning a
 - How R enables reproducible research
 - What constitues a tidy dataset
 - "Piping" commands together to form a workflow
-- Subseting and Filtering datasets using dplyr
-- The grammar of graphics approach to plotting used in ggplot2
+- Subseting and filtering datasets using dplyr
 - Producing summary statistics from a dataset
 - Joining datasets using dplyr
+- The grammar of graphics approach to plotting used in ggplot2
 
 ## Objectives: After this course you should be able to:
 
