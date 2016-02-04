@@ -14,12 +14,12 @@
     + select
     + mutate
     + useful string and date operations
-    + arrange
-    + filter
 - 11:30 - 12:30
     + piping
 - 12:30 - 13:30 LUNCH
 - 13:30 - 14:30 
+    + arrange
+    + filter
     + summarising / grouping data
     + joining / combining data
 - 14:30 - end 

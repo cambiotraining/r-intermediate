@@ -20,6 +20,7 @@ random_patients <- function(n) {
     sex,
     smokes,
     height_cm(name = "Height"),
+    normal(name="Weight"),
     birth(random = TRUE, x = NULL, start = Sys.Date() - 365 * 45, k = 365*2,by = "1 days"),
     state,
     pet,
@@ -34,7 +35,9 @@ random_patients <- function(n) {
 }
 
 patients <- random_patients(100)
-
+patients$Height <- ifelse(patients$Sex == "Male",rnorm(n=100,mean=175.3,sd=6),rnorm(n=100,161.9,sd=3))
+patients$Weight <- ifelse(patients$Sex == "Male",rnorm(n=100,mean=84,sd=6),rnorm(n=100,69,sd=3))
+patients$Weight <- paste0(patients$Weight, "kg")
 ```
 
 1. Change some values of `Smokes` to yes/no
