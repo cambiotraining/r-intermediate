@@ -2,7 +2,7 @@
 
 ##Description: 
 
-It has been said that 80% of data analysis is spent on the process of cleaning and preparing the data. In this course we introduce some relatively-new additions to the R programming language, dplyr and ggplot2, that provide a powerful toolkit to make the process of manipulating and visualising data easy and intuitive.  
+It has been said that 80% of data analysis is spent on the process of cleaning and preparing the data. In this course we introduce some relatively-new additions to the R programming language; dplyr and ggplot2. In combination these provide a powerful toolkit to make the process of manipulating and visualising data easy and intuitive.  
 
 ## Target audience
 
@@ -12,8 +12,8 @@ It has been said that 80% of data analysis is spent on the process of cleaning a
 
 ## Pre-requisites
 
-- Attending the "Introduction to Solving Biological Problems using R" course would be beneficial, but not essential. We will assume that you know how to load RStudio, create variables and call functions. Some good introductory videos can be found here -> http://shop.oreilly.com/product/0636920034834.do
-- We would recommend this course to those with programming experience in other languages that want to know what R can offer them. Likewise you should also consider coming if you have used R for some years, but not familiar with dplyr and ggplot2.
+- Attending the "Introduction to Solving Biological Problems using R" course would be beneficial, but not essential. We will assume that you know how to load RStudio, create variables and use functions. Some good introductory videos can be found here -> http://shop.oreilly.com/product/0636920034834.do
+- We would recommend this course to those with programming experience in other languages that want to know what R can offer them. Likewise you should also consider coming if you have used R for some years, but are not familiar with dplyr and ggplot2.
 
 ## Aims: During this course you will learn about:
 

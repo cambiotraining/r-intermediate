@@ -5,72 +5,42 @@ date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
 output: html_document
 ---
 
+## Course outline
 
-##What's R?
+A data analysis can be broken-down into several stages. There is, however, no such thing as a typical analysis. Most datasets we will encounter will have their own issues and problems that need fixing. We will also need to spend a lot of time visualising our data in different ways in order to gain insights. Unfortunately, in R there are many hundreds (thousands!) of functions for us to choose from to achieve our goals, and everyone will have their own set of favourites. The tools we will meet today help us to explore data in a consistent and "pipeline-able" manner. 
 
-* A statistical programming environment
-    + based on 'S'
-    + suited to high-level data analysis
-* Open source and cross platform
-* Extensive graphics capabilities
-* Diverse range of add-on packages
-* Active community of developers
-* Thorough documentation
+![data-cycle](images/data-cycle.png)
+
+(from Hadley Wickham's workshop at [useR2014](http://datascience.la/hadley-wickhams-dplyr-tutorial-at-user-2014-part-1/))
 
 
-## The R-project page
+## Advantages of R
 
-http://www.r-project.org/
+![NYT](images/NYTimes_R_Article.png)
 
-![R screenshot](images/R-project.png)
+The R programming language is now recognised beyond the academic community as an effect solution for data analysis and visualisation. [Notable users of R](http://www.revolutionanalytics.com/companies-using-r) include [Facebook](http://blog.revolutionanalytics.com/2010/12/analysis-of-facebook-status-updates.html), [google](http://blog.revolutionanalytics.com/2009/05/google-using-r-to-analyze-effectiveness-of-tv-ads.html), [Microsoft](http://blog.revolutionanalytics.com/2014/05/microsoft-uses-r-for-xbox-matchmaking.html) (who recently [invested](http://blogs.microsoft.com/blog/2015/01/23/microsoft-acquire-revolution-analytics-help-customers-find-big-data-value-advanced-statistical-analysis/) in a commerical provider of R), and the [New York Times](http://blog.revolutionanalytics.com/2011/03/how-the-new-york-times-uses-r-for-data-visualization.html).
 
-##R in the New York Times
-http://goo.gl/pww4ZO
+The main advantages are;
 
-![R new york time](images/NYTimes_R_Article.png)
+- Open-source
+- Cross-platform
+- Access to existing visualisation / statistical tools
+- Flexibility
+- Visualisation and interactivity
+- Facilitaing ***Reproducible Research***
 
-##R in Nature
-![R in nature](images/r-in-nature.png)
+![duke-scandal](images/rep-research-nyt.png)
 
-##R plotting capabilities
-http://spatial.ly/2012/02/great-maps-ggplot2/
+Two Biostatiscians (later termed '*Forensic Bioinformaticians*') from M.D. Anderson used R extensively during their re-analysis and investigation of a Clinical Prognostication paper from Duke. The subsequent [scandal](https://www.youtube.com/watch?v=W5sZTNPMQRM) put Reproducible Research at the forefront of everyone's mind.
 
-![R cycle journeys](images/cyclejourneys.png)
+Keith Baggerly's [talk](https://www.youtube.com/watch?v=7gYIs7uYbMo) is highy-recommended.
 
-##R plotting capabilities
-https://www.facebook.com/notes/facebook-engineering/visualizing-friendships/469716398919
-![R facebook](images/facebook-network.png)
+## Support for R
 
-##Who uses R? Not just academics!
-http://www.revolutionanalytics.com/companies-using-r
-
-- Facebook
-    + http://blog.revolutionanalytics.com/2010/12/analysis-of-facebook-status-updates.html
-- Google
-    + http://blog.revolutionanalytics.com/2009/05/google-using-r-to-analyze-effectiveness-of-tv-ads.html
-- Microsoft
-    + http://blog.revolutionanalytics.com/2014/05/microsoft-uses-r-for-xbox-matchmaking.html
-- New York Times
-    + http://blog.revolutionanalytics.com/2011/03/how-the-new-york-times-uses-r-for-data-visualization.html
-
-## R can facilitate Reproducible Research
-
-![step-two](images/SidneyHarris_MiracleWeb.jpg)
-
-Sidney Harris - New York Times
-
-##It is a hot topic at the moment
-
-- Statisticians at MD Anderson tried to reproduce results from a Duke paper and unintentionally unravelled a web of incompetence and skullduggery
-    + as reported in the ***New York Times***
-    
-![nyt-article](images/rep-research-nyt.png)
-
-##Hear the full account
-
-- Very entertaining talk from Keith Baggerly in Cambridge, December 2010
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/7gYIs7uYbMo" frameborder="0" allowfullscreen></iframe>
+- Online forums such as [Stack Overflow](http://stackoverflow.com/questions/tagged/r) regularly feature R
+- [Blogs](http://www.r-bloggers.com/)
+- Local [user groups](http://www.meetup.com/Cambridge-R-Users-Group-Meetup/) 
+- Documentation via `?` or `help.start()`
 
 ##Various platforms supported
 
@@ -83,9 +53,6 @@ Sidney Harris - New York Times
 - On this course, we use the RStudio GUI (www.rstudio.com)
 - Everything you need is installed on the training machines
 - If you are using your own machine, download both R and RStudio
-
-
-
 
 ##Getting started
 
@@ -190,7 +157,6 @@ seq(from = 2, to = 20, by = 4)
 seq(2, 20, 4)
 ```
 
-##Basic concepts in R - vectors
 
 - The basic data structure in R is a **vector** -- an ordered collection of values. 
 - R treats even single values as 1-element vectors. 
@@ -213,119 +179,89 @@ y <- c(2,3)
 x[y]
 ```
 
-##Basic concepts in R - vectors
-- There are a number of shortcuts to create a vector. Instead of:
-```{r vectors4}
-x <- c(3,4,5,6,7,8,9,10,11,12)
-```
-- we can write:
-```{r vectors5}
-x <- 3:12
-x
-```
-- or we can use the `seq()` function, which returns a vector:
-```{r vectors6}
-x <- seq(2, 20, 4)
-x
+A vector can also contain text; called a character vector. Such a vector can also be constructed using the `c` function.
+
+```{r}
+x <- c("A","B","C","D")
 ```
 
-```{r vectors7}
-x <- seq(2, 20, length.out=5)
-x
+Another useful type of data that we will see is the *logical* or *boolean* which can take either the values of `TRUE` or `FALSE`
+
+```{r}
+x <- c(TRUE,TRUE,FALSE)
 ```
 
 
-##Basic concepts in R - vectors
-- or we can use the `rep()` function:
+## Vector arithmetic
 
-```{r vectors8}
-y <- rep(3, 5)
-y
-```
-
-```{r vectors9}
-y <- rep(1:3, 5)
-y
-```
-
-
-
-##Basic concepts in R - vectors
-- We have seen some ways of extracting elements of a vector. We can use these shortcuts to make things easier (or more complex!)
-
-```{r vectors10}
-x <- 3:12
-x[3:7]
-x[seq(2, 6, 2)]
-x[rep(3, 2)]
-```
-
-
-##Basic concepts in R - vectors
-- We can add an element to a vector:
-```{r vectors11}
-y <- c(x, 1)
-y
-```
-- We can glue vectors together:
-```{r vectors12}
-z <- c(x, y)
-z
-```
-
-##Basic concepts in R - vectors
-- We can remove element(s) from a vector:
-```{r vectors13}
-x <- 3:12
-x[-3]
-x[-(5:7)]
-x[-seq(2, 6, 2)]
-```
-
-##Basic concepts in R - vectors
-
-- Finally, we can modify the contents of a vector:
-```{r vectors14}
-x[6] <- 4
-x
-x[3:5] <- 1
-x
-```
-
-Remember! 
-- **Square** brackets for ***indexing*** []
-- **parentheses** for function ***arguments*** ().
-
-##Basic concepts in R - vector arithmetic
-
-- When applying all standard arithmetic operations to vectors,
-application is element-wise
+- When applying all standard arithmetic operations to vectors, application is element-wise
 
 ```{r vector-arithmetic1}
 x <- 1:10
 y <- x*2
 y
 z <- x^2
-z
+
+x + y
 ```
 
-##Basic concepts in R - vector arithmetic
+We can also use functions on the vector, and the function will be applied to each element in turn.
 
-- Adding two vectors
-```{r vector-arithmetic2}
-y + z
+```{r}
+x <- c(-1,-0.5,0,0.5,1)
+sin(x)
 ```
-- If vectors are not the same length, the shorter one will be recycled:
-```{r vector-arithmetic3}
-x + 1:2
+
+```{r}
+sum(x)
 ```
-- But be careful if the vector lengths aren't factors of each other:
+
+
+## The data frame
+
+The data frame object in R allows us to work with "tabular" data, like we might be used to dealing with in Excel, where our data can be thought of having rows and columns. The values in each column have to all be of the same type (i.e. all numbers or all text).
+
+The `iris` data frame is a classic dataset that is built into R. To load these data, we use the `data` function with the name `iris` (notice no quotation marks) in brackets. The data frame can then be printed to screen by typing it's name (`iris`).
+
+```{r}
+data(iris)
+```
+
+The `View` function will create a tab in RStudio that we can use to browse the data.
 
 ```{r eval=FALSE}
-x + 1:3
+View(iris)
 ```
 
-```{r vector-arithmetic4,echo=FALSE}
-options(width=50)
-x + 1:3
+A commonly-used function is `head` which will print the first six rows to the screen, otherwise R will attempt to show the entire object (very annoying for large objects!).
+```{r}
+head(iris)
 ```
+
+We can notice that there are `nrow(iris)` rows and `ncol(iris)` columns. There is also a function in R, `dim`, that will print the dimensions for us. The `colnames` function will also print the names of the functions.
+
+```{r}
+dim(iris)
+colnames(iris)
+```
+
+The `summary` function is a versatile function to summarise an object. For this dataset, it reports the distribution of values in the first four columns, and a summary of the *categories* in the final column.
+
+```{r}
+summary(iris)
+```
+
+We will explore plotting in much more detail later on the course. R provides a wide-variety of [plotting options](http://www.statmethods.net/graphs/index.html) as part of the *base* distribution. Without going into too much detail, the following will create a boxplot of the values in `Sepal.Length` column categorised into the different values of `Species`.
+
+```{r}
+boxplot(Sepal.Length~Species,iris)
+```
+
+## A Short Analysis Example
+
+- Open the file `iris.Rmd`
+    + this contains the code we have just looked at to load and visualise the `iris` dataset
+    + change the header information to contain your name and the date
+    + compile the document by pressing the ***Knit HTML*** button. This should produce a file called `iris.html`
+    + modify the Rmd file so that the boxplot of the `Petal.Length` variable is produced, rather than `Sepal.Length`
+    
