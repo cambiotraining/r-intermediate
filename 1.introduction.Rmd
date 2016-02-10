@@ -223,6 +223,8 @@ The data frame object in R allows us to work with "tabular" data, like we might 
 
 The `iris` data frame is a classic dataset that is built into R. To load these data, we use the `data` function with the name `iris` (notice no quotation marks) in brackets. The data frame can then be printed to screen by typing it's name (`iris`).
 
+N.B. As we will see later, we tend to read datasets into R using `read.csv`, `read.delim` or similar functions.
+
 ```{r}
 data(iris)
 ```

@@ -9,7 +9,6 @@ output: html_document
 
 ## Motivation
 
-
 ![tolstoy](images/tolstoy.jpg)
 
 
@@ -21,8 +20,6 @@ output: html_document
 http://vimeo.com/33727555
 
 http://vita.had.co.nz/papers/tidy-data.pdf
-
-## Working with data frames
 
 ## Tidy data principles
 
@@ -162,7 +159,7 @@ spread(tidy, Treatment,Count)
 
 We are going to explore some of the basic features of R using some patient data; the kind of data that we might encounter in the wild. However, rather than using real-life data we are going to make some up. There is a package called `wakefield` that is particularly convenient for this task.
 
-Various patient characteristics have be generated and saved in the file `patient-data.txt`. 
+Various patient characteristics have been generated and saved in the file `patient-data.txt`. 
 
 ```{r}
 patients <- read.delim("patient-data.txt")
