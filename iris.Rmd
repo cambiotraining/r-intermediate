@@ -1,0 +1,22 @@
+---
+title: "Analysis of the Iris Dataset"
+author: "Your Name"
+date: "The date"
+output: html_document
+---
+
+```{r}
+data(iris)
+head(iris)
+dim(iris)
+```
+
+
+```{r}
+summary(iris)
+```
+
+```{r}
+boxplot(Sepal.Length~Species,iris)
+```
+
