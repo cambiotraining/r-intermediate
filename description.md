@@ -1,5 +1,9 @@
 # Data Analysis and Visualisation in R
 
+## Instructors:
+- Mark Dunning and Matt Eldridge, Cancer Research Uk Cambridge Institute
+- Tom Carroll, MRC Clinical Sciences Centre, London
+
 ##Description: 
 
 It has been said that 80% of data analysis is spent on the process of cleaning and preparing the data. In this course we introduce some relatively-new additions to the R programming language; dplyr and ggplot2. In combination these provide a powerful toolkit to make the process of manipulating and visualising data easy and intuitive.  
