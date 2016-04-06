@@ -13,6 +13,7 @@ A data analysis can be broken-down into several stages. There is, however, no su
 
 (from Hadley Wickham's workshop at [useR2014](http://datascience.la/hadley-wickhams-dplyr-tutorial-at-user-2014-part-1/))
 
+Hadley also has these words of advice that we should bear in mind as we proceed through the course.
 
 > Whenever you’re learning a new tool, for a long time you’re going to suck… But the good news is that is typical, that’s something that happens to everyone, and it’s only temporary.
 
@@ -248,6 +249,14 @@ We can notice that there are `nrow(iris)` rows and `ncol(iris)` columns. There i
 dim(iris)
 colnames(iris)
 ```
+
+Data for a particular column can be accessed using what is known as the `$` operator
+
+```{r eval=FALSE}
+iris$Sepal.Length
+iris$Species
+```
+
 
 The `summary` function is a versatile function to summarise an object. For this dataset, it reports the distribution of values in the first four columns, and a summary of the *categories* in the final column.
 
