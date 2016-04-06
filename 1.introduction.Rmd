@@ -14,6 +14,8 @@ A data analysis can be broken-down into several stages. There is, however, no su
 (from Hadley Wickham's workshop at [useR2014](http://datascience.la/hadley-wickhams-dplyr-tutorial-at-user-2014-part-1/))
 
 
+> Whenever you’re learning a new tool, for a long time you’re going to suck… But the good news is that is typical, that’s something that happens to everyone, and it’s only temporary.
+
 ## Advantages of R
 
 ![NYT](images/NYTimes_R_Article.png)
