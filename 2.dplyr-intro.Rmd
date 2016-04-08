@@ -5,9 +5,17 @@ date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
 output: html_document
 ---
 
+# Overview of this section
 
+- tidy data
+    + what it means
+    + how to create it
+- `select` and `mutate` verbs in dplyr
+- advice for cleaning strings
 
-## Motivation
+As we saw, our data, and especially data we might find out "in the wild", may need "cleaning"" before we can use it
+
+![data-cycle](images/data-cycle.png)
 
 ![tolstoy](images/tolstoy.jpg)
 
@@ -21,20 +29,11 @@ http://vimeo.com/33727555
 
 http://vita.had.co.nz/papers/tidy-data.pdf
 
-## Tidy data principles
 
-Two guiding principles:
 
-- Each column is a variable
-- Each row is an observation
-
-However,
-
-- Un-tidy data are easier for humans to read
-- Tidy data are easier for computers to analyse
-
-    
 ## Example (from tidyr paper)
+
+Consider the following....
 
 ```{r echo=FALSE,results='asis'}
 library(knitr)
@@ -44,62 +43,97 @@ kable(untidy)
 
 http://vita.had.co.nz/papers/tidy-data.pdf
 
-## Re-arranging the data
-
-```{r echo=FALSE,results='asis'}
-untidy2 <- t(untidy)
-colnames(untidy2) <- untidy2[1,]
-untidy2 <- untidy2[-1,]
-kable(untidy2)
-```
-
-## Definitions
-
 - A dataset is made up of ***values***
 - Each value is associated with a ***variable** and an ***observation***
     + variable contains all values that measure the same underlying variable
     + an observation contains all values measured on the same unit
-- How many values, variables and observations do we have?
 
-## Answer
+In this example dataset we have *18* values and *3* variables
 
-- 18 values
-- 3 variables
-    + Person 
-    + Treatment
-    + Result
-- 6 observations
+1. Person (John, Jane or Mary)
+2. Treatment (A or B)
+3. "Result"
 
-## Tidy form of the data
 
-- We now have one column for each variable
+
+The guiding principles:
+
+- Each column is a variable
+- Each row is an observation
+- Each type of observational unit forms a table
+
+The tidy form of this data thus becomes;
+
+
 ```{r echo=FALSE,warning=FALSE}
 library(tidyr)
 suppressPackageStartupMessages(library(dplyr))
 gather(untidy, Treatment, Result, treatmenta:treatmentb) %>% mutate(Treatment = gsub("treatment","",Treatment))
 ```
 
+
+We can notice that;
+
+- Un-tidy data are easier for humans to read
+- Tidy data are easier for computers to analyse
+
+We have already seen a tidy dataset in the form of `iris`
+
+```{r}
+head(iris)
+```
+
+    
 ## The tidyr package
 
 - Two main functions
     + `gather()` and `spread()`
     
-## How to use gather
 
 ```{r}
 untidy <- read.delim("tidyr-example.txt")
 untidy
 ```
 
-## How to use gather
+`gather` is the function that can collapse multiple columns into key-value pairs. 
 
-- Creates a column of 'Treatment' keys
-    + the variables to use in the original data frame are treatmenta and treatmentb
+- similar to `stack` in base R
+- or `melt` in the `reshape` / `reshape2` pacakges
+
+The arguments are;
+
+- the data frame you want to manipulate
+- the name of the *key* column you want to create
+- the name of the *value* column you want to create
+- the *names* of the columns in the data frame that are to be collapsed
+    + note you don't need "" to define the column names
+        
+
 ```{r warning=FALSE}
 gather(untidy, Treatment, Result, c(treatmenta,treatmentb))
 ```
 
+When specifying columns, an alternative is to ignore some column names
 
+```{r warning=FALSE}
+gather(untidy, Treatment, Result, -Name)
+```
+
+Can also specify column index
+
+```{r warning=FALSE}
+gather(untidy, Treatment, Result, 2:3)
+```
+
+Note that after all these operations, the original data frame (`untidy`) is unaltered
+  - we need to create a new variable to save the result
+
+```{r}
+untidy
+tidy <- gather(untidy, Treatment, Result, c(treatmenta,treatmentb))
+```
+
+******
 
 ## Example: Simulated clinical data
 
@@ -113,12 +147,19 @@ kable(head(messyData))
 
 - What variables and observations do we have?
 - What might a 'tidy' version of the dataset look like?
+- Use the `tidyr` package to create a tidy version of the data
+
+******
 
 ## Tidy form
 
 ```{r echo=FALSE, results='asis',message=FALSE}
 library(tidyr)
 tidy <- gather(messyData,Treatment, Count, -Subject)
+```
+
+```{r echo=FALSE}
+head(tidy)
 ```
 
 
@@ -130,34 +171,29 @@ tidy <- gather(messyData,Treatment, Count, -Subject)
 
 `separate` from the same package will also sort out the treatment names.
 
-```{r}
+```{r eval=FALSE}
 separate(tidy,Treatment,into=c("Treatment","Rep"))
 ```
 
-
-N.B. spread has the opposite effect to gather and will translate tidy data back into human-readable form
-
-```{r}
-
-spread(tidy, Treatment,Count)
+```{r echo=FALSE}
+head(separate(tidy,Treatment,into=c("Treatment","Rep")))
 ```
 
 
-## Introducing dplyr
+N.B. `spread` has the opposite effect to gather and will translate tidy data back into human-readable form
 
-- dplyr is an all-purpose data wrangling tool
-- It introduces several 'verbs' that can be used to perform any data manipulation task
-    + mutate: create new columns (variables)
-    + select: select *columns*
-    + filter: select *rows*
-    + arrange: re-order arrange rows
-    + summarise: summarise values
-- Essential reference
-    + [dplyr cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+```{r eval=FALSE}
+spread(tidy, Treatment,Count)
+```
 
-## Example
+```{r echo=FALSE}
+head(spread(tidy, Treatment,Count))
+```
 
-We are going to explore some of the basic features of R using some patient data; the kind of data that we might encounter in the wild. However, rather than using real-life data we are going to make some up. There is a package called `wakefield` that is particularly convenient for this task.
+
+## dpylr introduction, and more data-cleaning
+
+We are going to explore some of the basic features of `dplyr` using some patient data; the kind of data that we might encounter in the wild. However, rather than using real-life data we are going to make some up. There is a package called `wakefield` that is particularly convenient for this task.
 
 Various patient characteristics have been generated and saved in the file `patient-data.txt`. 
 
@@ -174,15 +210,6 @@ View(patients)
 
 
 
-
-******
-
-## Q. What are the dimensions of the data frame?
-
-## Q. What columns are available?
-
-******
-
 `patients` can be converted to a special kind of data frame. The main difference is that the whole data frame does not get printed to screen
 
 ```{r}
@@ -195,24 +222,24 @@ patients
 The `tbl_df` function in dplyr creates a new object with more-convenient default display
 
 - The object behaves in exactly the same way as a data frame
+- `glimpse` can be used to get a snapshot of your data
+    + similar to `str` function in base R
 
 ```{r}
 glimpse(patients)
 ```
 
-## Selecting variables
+## Selecting variables; the `select` verb
 
 The default is to print the data frame in an intelligent manner, so not to flood the R console. If we want to control what variables are printed we can use the `select` function, which allows us to print certain columns to the screen.
 
+
 In the R introduction, we saw how to extract columns from a data frame with a `$` symbol. 
+
+  - Remember that we're not changing the data frame, just exploring it
 
 ```{r}
 patients$Name
-```
-
-
-```{r}
-select(patients, Name)
 ```
 
 The `$` operator works fine for single columns, but for multiple columns it quickly gets a bit messy as we have to resort to using `[]`
@@ -222,6 +249,13 @@ patients[,c("Name","Race")]
 ```
 
 However, `select` is a lot more intuitive
+
+  - Notice the lack of `""`
+
+```{r}
+select(patients, Name)
+```
+
 
 ```{r}
 select(patients, Name, Race)
@@ -245,43 +279,112 @@ select(patients, starts_with("Grade"))
 ```
 
 see also
+
 - contains, matches, ends_with
 
 ## Transforming / cleaning the data
 
 
+We can now begin to explore the data. Imagine that we want to do a simple barplot to the number of males and females. Using base graphics, we can do this with;
+
 ```{r}
-library(stringr)
+barplot(table(patients$Sex))
 ```
 
-We notice that the Sex column has whitespace
+******
+
+- What do you think the problem might be?
+- Try printing out all values for this column, or using the `nchar` function to determine the problem
+
+******
+
+So we notice that the Sex column has "whitespace"; not an uncommon problem if data have been entered manually.
+
+
 
 ```{r}
 table(select(patients, Sex))
 as.character(patients$Sex)
+```
+
+The base distribution of R has many functions for dealing with strings. However, the `stringr` package (again from Hadley Wickham) aims to provide a clean modern interface to many common string operations.
+
+Of particular interest here is the `str_trim` (`?str_trim`) function that will trim whitespace from a vector of strings. Arguments can be used to specify whether to remove whitespace from either side of the string, or just the left or right. 
+
+```{r}
+library(stringr)
 str_trim(patients$Sex)
+```
+
+Once we have worked-out how to created a cleaned version of the variable, we need to update the data frame. This can be done using the next of the **dplyr verbs**; `mutate`.
+
+`mutate` allows us to compute and append one or more new columns to a data frame. Notice that we keep our original data intact and create a new cleaned data frame
+
+```{r}
 mutate(patients, Sex = str_trim(Sex))
 patients_clean <- mutate(patients, Sex = factor(str_trim(Sex)))
 ```
 
-IDs to be padded to 3 digits
+Rather than removing whitespace, sometimes we might want to adjust a set of strings so that they have a fixed width. We can do this be adding a *padding* character to each string if necessary. This operations is often done with a set of identifiers.
 
 ```{r}
 str_pad(patients$ID,pad = "0",width=3)
 patients_clean <- mutate(patients_clean, ID=str_pad(patients_clean$ID,pad = "0",width=3))
 ```
 
-Height contains cm string
+Similarly, we might want to trim all the strings between a particular start and end position
+
+```{r}
+str_sub(patients$State, 1,3)
+str_sub(patients$Name, 2,5)
+```
+
+Finally, we can convert entire strings to upper- or lower-case
+
+```{r}
+str_to_lower(patients$Pet)
+str_to_upper(patients$Name)
+```
+
+## String Replacement
+
+We might want to look at the distribution of heights amongst our patients. However, if we try this we are immediately hit with an error message
+
+```{r eval=FALSE}
+hist(patients$Height)
+```
+
+```{r echo=FALSE}
+err <- try(hist(patients$Height),silent = TRUE)
+cat(err)
+```
+
+The problem is that R thinks that values are not numbers. Why might that be?
 
 ```{r}
 select(patients,Height)
-mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
-
 ```
+
+To convert the values back to numbers we first need to remove the `"cm""` at the end of each value. We can do this with a *string replacement* operation. In this case, the particular string we want to put in the place of `"cm"` is the *empty string* `""`. The replacement can be done using the `str_replace_all` function.
 
 
 ```{r}
+mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
+```
+
+However, what do you notice about the class reported for the Height column after this operation. [compare to the `Count` column for example]
+
+We need an extra conversion step.
+
+```{r}
 patients_clean <- mutate(patients_clean, Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm","")))
+hist(patients_clean$Height)
+```
+
+
+
+```{r}
+patients$Grade_Level
 ```
 
 
@@ -318,7 +421,7 @@ patients_clean <- mutate(patients_clean, Age = year(as.period(age)))
 patients_clean
 ```
 
-******
+
 
 ## Exercise
 
@@ -337,4 +440,5 @@ patients_clean <- mutate(patients_clean, Smokes = as.logical(str_replace_all(Smo
 patients_clean <- mutate(patients_clean, Candidate = Smokes & Overweight)
 patients_clean
 ```
+
 

@@ -5,6 +5,11 @@ date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
 output: html_document
 ---
 
+# Overview of this section
+
+- Introducing piping
+- **filter** verb
+- **arrange** verb
 
 ```{r echo=FALSE}
 suppressPackageStartupMessages(library(dplyr))
@@ -32,6 +37,9 @@ In computing, this is referring to as *piping*
 ## Why do we need this?
 
 We've ended up with a long chain of commands
+
+- prone to error if we copy-and paste
+- notice how the output of one line is the input to the following line
 
 ```{r}
 
@@ -62,5 +70,62 @@ patients_clean
 ```
 
 
+******
 
+Take the dataset including the BMI measurements
+
+Re-write in the piping framework
+Add a step to print just the ID, Name, Date of Birth, Smokes and Overweight columns
+
+******
+
+```{r}
+mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg",""))) %>% 
+  mutate(BMI = (Weight/(Height/100)^2), Overweight = BMI > 25) %>% 
+  mutate(Smokes = str_replace_all(Smokes, "Yes", TRUE)) %>% 
+  mutate(Smokes = as.logical(str_replace_all(Smokes, "No", FALSE))) %>% 
+  mutate(Candidate = Smokes & Overweight) %>% 
+  select(ID, Name, Birth,BMI,Smokes,Overweight)
+
+```
+
+
+## Selecting rows: **filter**
+
+The **`filter``** verb is used to select rows from the data frame
+
+```{r}
+filter(patients, Sex == "Male") 
+```
+
+```{r}
+filter(patients, Sex == "Male" & Died)
+```
+
+```{r}
+filter(patients, Sex != "Male" | Grade_Level > 1)
+```
+
+
+******
+
+Modify the workflow to select the candidates (overweight smokers)
+
+******
+
+
+```{r}
+mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg",""))) %>% 
+  mutate(BMI = (Weight/(Height/100)^2), Overweight = BMI > 25) %>% 
+  mutate(Smokes = str_replace_all(Smokes, "Yes", TRUE)) %>% 
+  mutate(Smokes = as.logical(str_replace_all(Smokes, "No", FALSE))) %>% 
+  mutate(Candidate = Smokes & Overweight) %>% 
+  filter(Smokes & Overweight) %>% 
+  select(ID, Name, Birth,Smokes,Overweight)
+
+```
+
+```{r}
+arrange(patients, Height)
+```
 

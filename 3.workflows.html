@@ -63,10 +63,17 @@ img {
 <div id="header">
 <h1 class="title">Towards Analysis Workflows in R</h1>
 <h4 class="author"><em>Mark Dunning</em></h4>
-<h4 class="date"><em>Last modified: 04 Feb 2016</em></h4>
+<h4 class="date"><em>Last modified: 08 Apr 2016</em></h4>
 </div>
 
 
+<div id="overview-of-this-section" class="section level1">
+<h1>Overview of this section</h1>
+<ul>
+<li>Introducing piping</li>
+<li><strong>filter</strong> verb</li>
+<li><strong>arrange</strong> verb</li>
+</ul>
 <div id="introducing-piping" class="section level2">
 <h2>Introducing piping</h2>
 <p>The output of one operations gets used as the input of the next</p>
@@ -83,6 +90,9 @@ img {
 <div id="why-do-we-need-this" class="section level2">
 <h2>Why do we need this?</h2>
 <p>We’ve ended up with a long chain of commands</p>
+<ul>
+<li>prone to error if we copy-and paste</li>
+</ul>
 <pre class="r"><code>patients_clean&lt;- mutate(patients, Sex = factor(str_trim(Sex)))
 patients_clean &lt;- mutate(patients_clean, ID=str_pad(patients_clean$ID,pad = &quot;0&quot;,width=3))
 patients_clean &lt;- mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = &quot;cm&quot;,&quot;&quot;))</code></pre>
@@ -116,6 +126,7 @@ patients_clean</code></pre>
 ## ..   ...       ...      ...   ...    ...    ...              ...
 ## Variables not shown: Weight (fctr), Birth (fctr), State (fctr), Pet
 ##   (fctr), Grade_Level (int), Died (lgl), Count (dbl), Date (fctr)</code></pre>
+</div>
 </div>
 
 
