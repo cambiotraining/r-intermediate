@@ -5,6 +5,10 @@ date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
 output: html_document
 ---
 
+## Motivation
+
+![spreadsheet](images/spreadsheet-full.png)
+
 ## Course outline
 
 A data analysis can be broken-down into several stages. There is, however, no such thing as a typical analysis. Most datasets we will encounter will have their own issues and problems that need fixing. We will also need to spend a lot of time visualising our data in different ways in order to gain insights. Unfortunately, in R there are many hundreds (thousands!) of functions for us to choose from to achieve our goals, and everyone will have their own set of favourites. The tools we will meet today help us to explore data in a consistent and "pipeline-able" manner. 

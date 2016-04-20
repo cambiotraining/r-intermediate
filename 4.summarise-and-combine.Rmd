@@ -1,6 +1,6 @@
 ---
-title: "Row Operations"
-author: "Mark Dunning"
+title: "Grouping, Summarising and Joining"
+author: "Matthew Eldridge"
 date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
 output: html_document
 ---
@@ -15,70 +15,4 @@ patients_clean <- mutate(patients_clean, ID=str_pad(patients_clean$ID,pad = "0",
 patients_clean <- mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
 ```
 
-
-## filter
-
-```{r}
-filter(patients, Count >= 1.5)
-```
-
-## filter
-```{r}
-filter(patients, Count >= 1.5, Died)
-```
-
-## filter
-
-```{r}
-filter(patients, Pet %in% c("Cat", "Dog"))
-```
-
-##arrange: order rows
-
-```{r}
-patients %>% 
-      select(Name, Count,Died) %>% 
-      filter(Count>1.5,Died) %>% 
-      arrange(Count)
-patients
-```
-
-
-## descending order
-
-```{r}
-patients  %>% 
-      select(Name, Count,Died) %>% 
-      filter(Count>1.5,Died) %>% 
-      arrange(desc(Count))
-patients
-```
-
-
-##Grouping
-
-summarise can be used in conjunction with a group-by operation
-
-```{r}
-patients %>% 
-    group_by(Died) %>% 
-    summarise(avg_count = mean(Count),
-              sd_count = sd(Count),
-              total = n())
-```
-
-Lets introduce some gene counts
-
-```{r}
-counts <-tbl_df(read.delim("gene-counts.txt")) %>% 
-  gather(ID, Count,-GeneID) %>% 
-  mutate(ID = str_sub(ID,2,4))
-```
-
-
-
-```{r}
-left_join(patients_clean,counts,by="ID")
-right_join(patients_clean,counts,by="ID")
-```
 

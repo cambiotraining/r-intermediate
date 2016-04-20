@@ -16,10 +16,10 @@
     + useful string and date operations
 - 11:30 - 12:30
     + piping
-- 12:30 - 13:30 LUNCH
-- 13:30 - 14:30 
     + arrange
     + filter
+- 12:30 - 13:30 LUNCH
+- 13:30 - 14:30 
     + summarising / grouping data
     + joining / combining data
 - 14:30 - end 
