@@ -7,16 +7,6 @@ output: html_document
 
 # Overview of this section
 
-- tidy data
-    + what it means
-    + how to create it
-- `select` and `mutate` verbs in dplyr
-- advice for cleaning strings
-
-As we saw, our data, and especially data we might find out "in the wild", may need "cleaning"" before we can use it
-
-![data-cycle](images/data-cycle.png)
-
 ![tolstoy](images/tolstoy.jpg)
 
 
@@ -30,6 +20,28 @@ http://vimeo.com/33727555
 http://vita.had.co.nz/papers/tidy-data.pdf
 
 
+- tidy data
+    + what it means
+    + how to create it
+- **`select`** and **`mutate`** verbs in dplyr
+- advice for cleaning strings and dates
+
+![data-cycle](images/data-cycle.png)
+
+As we saw, our data, and especially data we might find out "in the wild", may need "cleaning"" before we can use it. We will discuss how to clean our data for analysis. However, there are steps you can take to make sure your data are tidy and organised before importing into R.
+
+- [Karl Broman's tutorial on Data Organisation](http://kbroman.org/dataorg/)
+- ["Data Carpentry" workshop](http://lgatto.github.io/2015-09-10-CAM/)
+
+
+
+
+We have already seen a ***tidy*** dataset in the form of `iris`. As saw, it was possible to produce visualisations of the data using the `~` syntax.
+
+```{r}
+head(iris)
+```
+
 
 ## Example (from tidyr paper)
 
@@ -41,20 +53,11 @@ untidy <- data.frame(Name = c("John Smith","Jane Doe","Mary Johnson"),treatmenta
 kable(untidy)
 ```
 
-http://vita.had.co.nz/papers/tidy-data.pdf
-
-- A dataset is made up of ***values***
-- Each value is associated with a ***variable** and an ***observation***
-    + variable contains all values that measure the same underlying variable
-    + an observation contains all values measured on the same unit
-
-In this example dataset we have *18* values and *3* variables
+Data in this format are quite familiar to us, but not easily-interpretable by the computer. We need to think of the dataset in terms of *variables* and *values*. In this example dataset we have *18* values and *3* variables
 
 1. Person (John, Jane or Mary)
 2. Treatment (A or B)
 3. "Result"
-
-
 
 The guiding principles:
 
@@ -72,33 +75,18 @@ gather(untidy, Treatment, Result, treatmenta:treatmentb) %>% mutate(Treatment = 
 ```
 
 
-We can notice that;
+`gather` is a function in the `tidyr` package that can collapse multiple columns into key-value pairs. 
 
-- Un-tidy data are easier for humans to read
-- Tidy data are easier for computers to analyse
-
-We have already seen a tidy dataset in the form of `iris`
+- similar to `stack` in base R
+- or `melt` in the `reshape` / `reshape2` pacakges
 
 ```{r}
-head(iris)
-```
-
-    
-## The tidyr package
-
-- Two main functions
-    + `gather()` and `spread()`
-    
-
-```{r}
+library(tidyr)
 untidy <- read.delim("tidyr-example.txt")
 untidy
 ```
 
-`gather` is the function that can collapse multiple columns into key-value pairs. 
 
-- similar to `stack` in base R
-- or `melt` in the `reshape` / `reshape2` pacakges
 
 The arguments are;
 
@@ -127,6 +115,7 @@ gather(untidy, Treatment, Result, 2:3)
 
 Note that after all these operations, the original data frame (`untidy`) is unaltered
   - we need to create a new variable to save the result
+  - you should never work directly on the raw data
 
 ```{r}
 untidy
@@ -138,6 +127,13 @@ tidy <- gather(untidy, Treatment, Result, c(treatmenta,treatmentb))
 ## Example: Simulated clinical data
 
 Using data from the Mango Solutions training dataset
+
+```{r}
+library(mangoTraining)
+data("messyData")
+
+```
+
 
 ```{r results='asis',echo=FALSE}
 library(mangoTraining)
@@ -158,16 +154,6 @@ library(tidyr)
 tidy <- gather(messyData,Treatment, Count, -Subject)
 ```
 
-```{r echo=FALSE}
-head(tidy)
-```
-
-
-
-```{r eval=FALSE}
-library(tidyr)
-tidy <- gather(messyData,Treatment, Count, -Subject)
-```
 
 `separate` from the same package will also sort out the treatment names.
 
@@ -210,7 +196,7 @@ View(patients)
 
 
 
-`patients` can be converted to a special kind of data frame. The main difference is that the whole data frame does not get printed to screen
+Using `dplyr`, `patients` can be converted to a special kind of data frame; the `tbl_df`. The main difference is that the whole data frame does not get printed to screen. All operations that we could do on a data frame can be applied to a `tbl_df`.
 
 ```{r}
 library(dplyr)
@@ -231,9 +217,11 @@ glimpse(patients)
 
 ## Selecting variables; the `select` verb
 
+As we mentioned, `dplyr` introduces a series of ***verbs*** that can be used to operate on our data. The first we will introduce is *`select`*
+
 ![select](images/select.png)
 
-The default is to print the data frame in an intelligent manner, so not to flood the R console. If we want to control what variables are printed we can use the `select` function, which allows us to print certain columns to the screen.
+The default dispaly of a `tbl_df` object is to print the data frame in an intelligent manner, so not to flood the R console. If we want to control what variables are printed we can use the `select` function, which allows us to print certain columns to the screen.
 
 
 In the R introduction, we saw how to extract columns from a data frame with a `$` symbol. 
@@ -250,7 +238,13 @@ The `$` operator works fine for single columns, but for multiple columns it quic
 patients[,c("Name","Race")]
 ```
 
-However, `select` is a lot more intuitive
+Non R users probably find these commands a bit obtuse
+    + why the `[ ]`?
+    + what is `c`?
+    + need to remember the row and column index
+    + `[,...]` means display all rows
+
+However, `select` is a lot more intuitive; easier to convert to the sentance "Select the Name column from patients"
 
   - Notice the lack of `""`
 
@@ -258,17 +252,31 @@ However, `select` is a lot more intuitive
 select(patients, Name)
 ```
 
+*"Select the Name and Race columns"*
 
 ```{r}
 select(patients, Name, Race)
 ```
 
+Excluding certain columns in base R would require us to know the *index* we wanted to exclude, or to do something complicated with the column names
 
+```{r eval=FALSE}
+patients[,-2]
+patients[,setdiff(colnames(patients), "Name")]
+```
+
+```{r eval=FALSE}
+head(patients[,-2])
+head(patients[,setdiff(colnames(patients), "Name")])
+```
+
+Compare to dplyr version....*"Select all columns apart from Name"*
 
 ```{r}
 select(patients, -Name)
 ```
 
+Similarly easier to get columns within a particular range. *"Select all columns between Name and Sex"*
 
 ```{r}
 select(patients, Name:Sex)
@@ -320,7 +328,9 @@ str_trim(patients$Sex)
 
 Once we have worked-out how to created a cleaned version of the variable, we need to update the data frame. This can be done using the next of the **dplyr verbs**; `mutate`.
 
-`mutate` allows us to compute and append one or more new columns to a data frame. Notice that we keep our original data intact and create a new cleaned data frame
+## Creating new variables: The `mutate` verb
+
+`mutate` allows us to compute and append one or more new columns to a data frame. We can create new, cleaned, data frame and overwrite the Sex column
 
 ```{r}
 mutate(patients, Sex = str_trim(Sex))
@@ -367,30 +377,30 @@ The problem is that R thinks that values are not numbers. Why might that be?
 select(patients,Height)
 ```
 
-To convert the values back to numbers we first need to remove the `"cm""` at the end of each value. We can do this with a *string replacement* operation. In this case, the particular string we want to put in the place of `"cm"` is the *empty string* `""`. The replacement can be done using the `str_replace_all` function.
+To convert the values back to numbers we first need to remove the `"cm"` at the end of each value. We can do this with a *string replacement* operation. In this case, the particular string we want to put in the place of `"cm"` is the *empty string* `""`. The replacement can be done using the `str_replace_all` function.
 
 
 ```{r}
 mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
 ```
 
-However, what do you notice about the class reported for the Height column after this operation. [compare to the `Count` column for example]
+Note that the input to this function is the `patients_clean` object that we created previously. 
 
-We need an extra conversion step.
+However, what do you notice about the class reported for the Height column after this operation. 
+    + [compare to the `Count` column, for example]
+
+We need an extra conversion step to make sure these are represented as *numeric* values.
 
 ```{r}
 patients_clean <- mutate(patients_clean, Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm","")))
 hist(patients_clean$Height)
 ```
 
-
+Another potential issue in the data is the way in which the *grade* (i.e. tumour grade) of each patient has been recorded. Some data-entry schemes might use improbable values (such as 99) to encode missing values. Obviously this can introduce errors with some statistical analyses. What we probably want is to use the special `NA` value in R
 
 ```{r}
 patients$Grade_Level
 ```
-
-
-Grade has invalid values
 
 ```{r}
 grds <- patients$Grade_Level
@@ -400,22 +410,27 @@ patients_clean <- mutate(patients_clean, Grade = ifelse(grds == 99, NA,grds))
 
 ## Dealing with dates
 
+Dates are often problematic as they may be encoded in lots of different schemes
+
+If we wanted the year in which wach person was born it would be tempting to *trim* the first four characters of the string. However, getting the month or day might be a bit more problematic.
+
 ```{r}
 str_sub(patients$Birth,1,4)
 ```
 
-The `lubridate` package has lots of useful functions for dealing with dates
+The `lubridate` package has lots of useful functions for dealing with dates (also by Hadley Wickham!). For example it allows the year, month and day to be extracted.
 
 ```{r}
 library(lubridate)
 year(patients$Birth)
 ```
 
+It also supporting some clever manipulation, such as being able to subtract and add times.
 
 ```{r}
 
 dob <- ymd(patients$Birth)
-today <- ymd("20160203")
+today <- ymd("20160509")
 age <- interval(dob, today) 
 as.period(age)
 
@@ -432,14 +447,14 @@ patients_clean
     + where Weight is measured in Kilograms, and Height in Metres
 - A BMI of 25 is considered overweight, calculate a new variable to indicate which individuals are overweight
 - For a follow-on study, we are interested in overweight smokers
-    + create a "candidate" variable to indicate individuals that would be candidates for this study
+    + clean the `Smokes` column to contain just `TRUE` or `FALSE` values
+- (EXTRA) What other problems can you find in the data?
 
 ```{r echo=FALSE}
 patients_clean <- mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg","")))
 patients_clean <- mutate(patients_clean, BMI = (Weight/(Height/100)^2), Overweight = BMI > 25)
 patients_clean <- mutate(patients_clean, Smokes = str_replace_all(Smokes, "Yes", TRUE))
 patients_clean <- mutate(patients_clean, Smokes = as.logical(str_replace_all(Smokes, "No", FALSE)))
-patients_clean <- mutate(patients_clean, Candidate = Smokes & Overweight)
 patients_clean
 ```
 

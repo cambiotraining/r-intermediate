@@ -19,6 +19,35 @@ patients <- tbl_df(read.delim("patient-data.txt"))
 ```
 
 
+We've ended up with a long chain of steps to perform on our data. It is quite common to nest commands in R into a single line;
+
+```{r}
+patients <- tbl_df(read.delim("patient-data.txt"))
+```
+
+we read as *read the data in the file "patient-data.txt" and then convert the result into a `tbl_df` object*. 
+
+Could also do the same for our `mutate` statements, although this would quickly become tricky;
+
+
+```{r}
+patients_clean <- mutate(mutate(patients, Sex = factor(str_trim(Sex))),
+                         ID = str_pad(ID,pad="0",width=3))
+```
+
+Alternatively, we write each command as a separate line
+
+```{r}
+patients_clean<- mutate(patients, Sex = factor(str_trim(Sex)))
+patients_clean <- mutate(patients_clean, ID=str_pad(patients_clean$ID,pad = "0",width=3))
+patients_clean <- mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
+```
+
+
+- prone to error if we copy-and paste
+- notice how the output of one line is the input to the following line
+- less intuitive to read we step we did?
+
 ## Introducing piping
 
 The output of one operations gets used as the input of the next
@@ -34,23 +63,9 @@ In computing, this is referring to as *piping*
 
 - the magrittr library implements this in R
 
-## Why do we need this?
-
-We've ended up with a long chain of commands
-
-- prone to error if we copy-and paste
-- notice how the output of one line is the input to the following line
-
-```{r}
-
-patients_clean<- mutate(patients, Sex = factor(str_trim(Sex)))
-patients_clean <- mutate(patients_clean, ID=str_pad(patients_clean$ID,pad = "0",width=3))
-patients_clean <- mutate(patients_clean, Height= str_replace_all(patients_clean$Height,pattern = "cm",""))
-```
-
-
 ## Simple example
 
+Read the file `patient-data` and pass the result to the `head` function.
 ```{r eval=FALSE}
 patients <- read.delim("patient-data.txt")
 head(patients)
@@ -83,29 +98,62 @@ Add a step to print just the ID, Name, Date of Birth, Smokes and Overweight colu
 mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg",""))) %>% 
   mutate(BMI = (Weight/(Height/100)^2), Overweight = BMI > 25) %>% 
   mutate(Smokes = str_replace_all(Smokes, "Yes", TRUE)) %>% 
-  mutate(Smokes = as.logical(str_replace_all(Smokes, "No", FALSE))) %>% 
-  mutate(Candidate = Smokes & Overweight) %>% 
   select(ID, Name, Birth,BMI,Smokes,Overweight)
 
 ```
 
+Now having displayed the relevant information for our patients, we want to extract rows of interest from the data frame.
 
-## Selecting rows: **filter**
+
+## Selecting rows: The `filter` verb
 
 ![filter](images/filter.png)
 
-The **`filter``** verb is used to select rows from the data frame
+The **`filter``** verb is used to select rows from the data frame. The criteria we use to select can use the comparisons `==`, `>`, `<`, `!=`
+
+e.g. select all the males
 
 ```{r}
 filter(patients, Sex == "Male") 
 ```
 
+In base R, we would do
+
+```{r eval=FALSE}
+patients[patients$Sex == "Male",]
+```
+
+Again, to non R-users, this is less intuitive
+
+```{r echo=FALSE}
+head(patients[patients$Sex == "Male",])
+```
+
+Combining conditions can be achieved using `&` (and) `|` (or)
+
 ```{r}
 filter(patients, Sex == "Male" & Died)
 ```
 
+```{r eval=FALSE}
+patients[patients$Sex == "Male" & patients$Died,]
+```
+
+
+```{r echo=FALSE}
+patients[patients$Sex == "Male" & patients$Died,]
+```
+
+
 ```{r}
-filter(patients, Sex != "Male" | Grade_Level > 1)
+filter(patients, Sex == "Female" | Grade_Level > 1)
+```
+
+A really convenient function is `top_n`
+
+```{r}
+top_n(patients_clean,10,Height)
+top_n(patients_clean,10,Weight)
 ```
 
 
@@ -126,6 +174,8 @@ mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight
   select(ID, Name, Birth,Smokes,Overweight)
 
 ```
+
+## Ordering rows: The `arrange` verb
 
 ```{r}
 arrange(patients, Height)

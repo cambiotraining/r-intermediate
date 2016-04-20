@@ -1,5 +1,5 @@
 ---
-title: "Introduction"
+title: "Data Manipulation and Visualisation in R"
 author: "Mark Dunning"
 date: '`r format(Sys.time(), "Last modified: %d %b %Y")`'
 output: html_document
@@ -7,15 +7,26 @@ output: html_document
 
 ## Motivation
 
+Spreadsheets are a common entry-point for many types of analyses. Whilst they are great for exploring, visualising data in an interactive and intuitive manner they are not ideal for many production-level analyses.
+
+- Tedious and time-consuming to repeatedly process multiple files
+- Error-prone
+- Unwieldy and difficult to deal with large amounts of data
+- How can you (or someone else?) repeat what you did?
+
 ![spreadsheet](images/spreadsheet-full.png)
 
-## Course outline
+This course aims to translate how we think of data in spreadsheets to a series of operations that can be performed and chained together in R.
 
-A data analysis can be broken-down into several stages. There is, however, no such thing as a typical analysis. Most datasets we will encounter will have their own issues and problems that need fixing. We will also need to spend a lot of time visualising our data in different ways in order to gain insights. Unfortunately, in R there are many hundreds (thousands!) of functions for us to choose from to achieve our goals, and everyone will have their own set of favourites. The tools we will meet today help us to explore data in a consistent and "pipeline-able" manner. 
+
+A data analysis can be broken-down into several stages. There is, however, no such thing as a typical analysis. Most datasets we will encounter will have their own issues and problems that need fixing. We will also need to spend a lot of time visualising our data in different ways in order to gain insights. For every figure or table presented in a paper, there may be tens of hundreds of exploratory analyses that were generated along the way. We will show how such exploratory analysis can be performed in R.
 
 ![data-cycle](images/data-cycle.png)
 
 (from Hadley Wickham's workshop at [useR2014](http://datascience.la/hadley-wickhams-dplyr-tutorial-at-user-2014-part-1/))
+
+Unfortunately, in R there are many hundreds (thousands!) of functions for us to choose from to achieve our goals, and everyone will have their own set of favourites. The tools we will meet today help us to explore data in a consistent and "pipeline-able" manner. 
+
 
 Hadley also has these words of advice that we should bear in mind as we proceed through the course.
 
@@ -25,7 +36,7 @@ Hadley also has these words of advice that we should bear in mind as we proceed 
 
 ![NYT](images/NYTimes_R_Article.png)
 
-The R programming language is now recognised beyond the academic community as an effect solution for data analysis and visualisation. [Notable users of R](http://www.revolutionanalytics.com/companies-using-r) include [Facebook](http://blog.revolutionanalytics.com/2010/12/analysis-of-facebook-status-updates.html), [google](http://blog.revolutionanalytics.com/2009/05/google-using-r-to-analyze-effectiveness-of-tv-ads.html), [Microsoft](http://blog.revolutionanalytics.com/2014/05/microsoft-uses-r-for-xbox-matchmaking.html) (who recently [invested](http://blogs.microsoft.com/blog/2015/01/23/microsoft-acquire-revolution-analytics-help-customers-find-big-data-value-advanced-statistical-analysis/) in a commerical provider of R), and the [New York Times](http://blog.revolutionanalytics.com/2011/03/how-the-new-york-times-uses-r-for-data-visualization.html).
+The R programming language is now recognised beyond the academic community as an effect solution for data analysis and visualisation. [Notable users of R](http://www.revolutionanalytics.com/companies-using-r) include [Facebook](http://blog.revolutionanalytics.com/2010/12/analysis-of-facebook-status-updates.html), [google](http://blog.revolutionanalytics.com/2009/05/google-using-r-to-analyze-effectiveness-of-tv-ads.html),[buzzfeed](http://blog.revolutionanalytics.com/2015/12/buzzfeed-uses-r-for-data-journalism.html), [Microsoft](http://blog.revolutionanalytics.com/2014/05/microsoft-uses-r-for-xbox-matchmaking.html) (who recently [invested](http://blogs.microsoft.com/blog/2015/01/23/microsoft-acquire-revolution-analytics-help-customers-find-big-data-value-advanced-statistical-analysis/) in a commerical provider of R), and the [New York Times](http://blog.revolutionanalytics.com/2011/03/how-the-new-york-times-uses-r-for-data-visualization.html).
 
 The main advantages are;
 
@@ -146,24 +157,39 @@ sin(x)
 ```
 this returns the sine of x. In this case the function has one argument: **x**. Arguments are always contained in parentheses -- curved brackets, **()** -- separated by commas.
 
-- Try these:
 
-```{r functions1}
-sum(3,4,5,6)
-max(3,4,5,6)
-min(3,4,5,6)
-```
-
-##Basic concepts in R - functions
-
-- Arguments can be named or unnamed, but if they are unnamed they must be ordered (we will see later how to find the right order)
-      + when testing code, it is easier and safer to name the arguments
+Arguments can be named or unnamed, but if they are unnamed they must be ordered (we will see later how to find the right order). When testing code, it is easier and safer to name the arguments
 
 ```{r functions2}
 seq(from = 2, to = 20, by = 4)
 seq(2, 20, 4)
 ```
 
+Arguments can have *default* values, meaning we do not need to specify values for these in order to run the function.
+
+`rnorm` is a function that will generate a series of values from a *normal distribution*. In order to use the function, we need to tell R how many values we want
+
+```{r}
+rnorm(n=10)
+
+```
+
+The normal distribution is defined by a mean and standard deviation. However, we didn't tell R what mean and standard deviation we wanted. So how does R know what to do? All arguments to a function and their default values are listed in the help page
+
+(*N.B sometimes help pages can describe more than one function*)
+
+```{r eval=FALSE}
+?rnorm
+```
+
+In this case, we see that the defaults for mean and standard deviation are 0 and 1.
+
+```{r}
+rnorm(n=10, mean=2,sd=3)
+```
+
+
+##Basic concepts in R - vectors
 
 - The basic data structure in R is a **vector** -- an ordered collection of values. 
 - R treats even single values as 1-element vectors. 
@@ -198,6 +224,24 @@ Another useful type of data that we will see is the *logical* or *boolean* which
 x <- c(TRUE,TRUE,FALSE)
 ```
 
+Logical values are useful when we want to create subsets of our data. We can use *comparison* operators; `==`, `>`, `<`, `!=` to check if values are equal, greater than, less than, or not equal.
+
+```{r}
+x <- c("A","A", "B","B","C")
+x == "A"
+
+x <- rnorm(10)
+x > 0
+```
+
+
+
+All items in the vector **must** be the same type. If you attempt anything else, R will convert all values to the same type.
+
+```{r}
+x <- c(1, 2, "three")
+x
+```
 
 ## Vector arithmetic
 
@@ -212,16 +256,6 @@ z <- x^2
 x + y
 ```
 
-We can also use functions on the vector, and the function will be applied to each element in turn.
-
-```{r}
-x <- c(-1,-0.5,0,0.5,1)
-sin(x)
-```
-
-```{r}
-sum(x)
-```
 
 
 ## The data frame
@@ -259,8 +293,10 @@ Data for a particular column can be accessed using what is known as the `$` oper
 ```{r eval=FALSE}
 iris$Sepal.Length
 iris$Species
+iris$Species == "virginica"
 ```
 
+Here, `iris$Species` is a new type of object in R. It is an example of a *factor*, which is a type of object used frequently in data analysis. Rather than being merely a character string, the vector has a set of levels; **`r levels(iris$Species)`**. This allows us to perform various analyses that treat the values as belonging to different categories. For example, we might look to compare the distribution of length, width of different species and perform statistical testing. Having our data as factors aids such analyses.
 
 The `summary` function is a versatile function to summarise an object. For this dataset, it reports the distribution of values in the first four columns, and a summary of the *categories* in the final column.
 
@@ -275,7 +311,14 @@ boxplot(Sepal.Length~Species,iris)
 ```
 
 
-## How R can enable Reproducible Research
+## How can R enable Reproducible Research?
+
+
+
+Within RStudio we can write *markdown* documents, which are a mix of R code and text. The markdown file can be used as a template to generated PDF, HTML, or even Word documents. The clever bit is that all R code in the template can be execute and the results displayed (tables, graphics etc) along with the code. The compiled document can be passed to your collaborators and they should be able to generate the same results. Alternatively, you can choose to hide the code if your PI just wants to see the results, and not neccesarily what packages, parameters you used. Long-term R users may have heard of *Sweave*. Markdown is the same concept, but an easier to write (and read) syntax
+
+Markdown can also generate presentations and courses. Indeed, all the [materials for this course](https://github.com/cambiotraining/r-intermediate) were written in markdown.
+
 
 
 ![markdown](images/markdown-annotated.png)
