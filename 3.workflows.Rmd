@@ -65,7 +65,7 @@ We can re-write our steps from above;
 patients_clean <-
   mutate(patients, Sex = factor(str_trim(Sex))) %>% 
   mutate(ID=str_pad(ID,pad = "0",width=3)) %>% 
-  mutate(Height= str_replace_all(Height,pattern = "cm",""))
+  mutate(Height= as.numeric(str_replace_all(Height,pattern = "cm","")))
 patients_clean
 ```
 
@@ -91,6 +91,8 @@ mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight
 
 
 ## Selecting rows: **filter**
+
+![filter](images/filter.png)
 
 The **`filter``** verb is used to select rows from the data frame
 

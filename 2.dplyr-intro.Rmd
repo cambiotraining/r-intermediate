@@ -231,6 +231,8 @@ glimpse(patients)
 
 ## Selecting variables; the `select` verb
 
+![select](images/select.png)
+
 The default is to print the data frame in an intelligent manner, so not to flood the R console. If we want to control what variables are printed we can use the `select` function, which allows us to print certain columns to the screen.
 
 
