@@ -1,0 +1,33 @@
+---
+title: "Patient Data Exploration"
+author: "Mark Dunning"
+date: "21 April 2016"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(stringr)
+
+patients <- read.delim("patient-data.txt")
+patients <- tbl_df(patients)
+patients_clean <- mutate(patients, Sex = factor(str_trim(Sex)))
+patients_clean <- mutate(patients_clean, Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm","")))
+```
+
+- We want to calculate the Body Mass Index (BMI) for each of our patients
+- $BMI = (Weight) / (Height^2)$ 
+    + where Weight is measured in Kilograms, and Height in Metres
+- Create a new BMI variable in the dataset
+- A BMI of 25 is considered overweight, calculate a new variable to indicate which individuals are overweight
+- For a follow-on study, we are interested in overweight smokers
+    + clean the `Smokes` column to contain just `TRUE` or `FALSE` values
+- How many candidates (Overweight and Smoker) do you have?
+- (EXTRA) What other problems can you find in the data?
+
+
+```{r}
+##YOUR CODE HERE.....
+
+```
+

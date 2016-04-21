@@ -1,0 +1,34 @@
+---
+title: "Patient Data Exploration"
+author: "Mark Dunning"
+date: "21 April 2016"
+output: html_document
+---
+
+******
+
+Take the steps used to clean the patients dataset and calculate BMI (see template for the code)
+- Re-write in the piping framework
+- Add a step to print just the ID, Name, Date of Birth, Smokes and Overweight columns
+
+******
+
+```{r}
+library(dplyr)
+library(stringr)
+patients <- read.delim("patient-data.txt")
+patients <- tbl_df(patients)
+patients_clean <- mutate(patients, Sex = factor(str_trim(Sex)))
+patients_clean <- mutate(patients_clean, Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm","")))
+patients_clean <- mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg","")))
+patients_clean <- mutate(patients_clean, BMI = (Weight/(Height/100)^2), Overweight = BMI > 25)
+patients_clean <- mutate(patients_clean, Smokes = str_replace_all(Smokes, "Yes", TRUE))
+patients_clean <- mutate(patients_clean, Smokes = as.logical(str_replace_all(Smokes, "No", FALSE)))
+
+```
+
+
+```{r}
+## YOUR CODE HERE
+```
+

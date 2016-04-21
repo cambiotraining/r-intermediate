@@ -25,9 +25,10 @@ We've ended up with a long chain of steps to perform on our data. It is quite co
 patients <- tbl_df(read.delim("patient-data.txt"))
 ```
 
-we read as *read the data in the file "patient-data.txt" and then convert the result into a `tbl_df` object*. 
+we read as "
+> apply the `tbl_df` to the result of reading the file `patient-data.txt`
 
-Could also do the same for our `mutate` statements, although this would quickly become tricky;
+Could also do the same for our `mutate` statements, although this would quickly become tricky...
 
 
 ```{r}
@@ -35,7 +36,9 @@ patients_clean <- mutate(mutate(patients, Sex = factor(str_trim(Sex))),
                          ID = str_pad(ID,pad="0",width=3))
 ```
 
-Alternatively, we write each command as a separate line
+We always have to work out what the first statement was and work forwards from that.
+
+Alternatively, we could write each command as a separate line
 
 ```{r}
 patients_clean<- mutate(patients, Sex = factor(str_trim(Sex)))
@@ -46,7 +49,7 @@ patients_clean <- mutate(patients_clean, Height= str_replace_all(patients_clean$
 
 - prone to error if we copy-and paste
 - notice how the output of one line is the input to the following line
-- less intuitive to read we step we did?
+
 
 ## Introducing piping
 
@@ -67,30 +70,30 @@ In computing, this is referring to as *piping*
 
 Read the file `patient-data` and pass the result to the `head` function.
 ```{r eval=FALSE}
-patients <- read.delim("patient-data.txt")
-head(patients)
-
-patients %>% head
-
+patients <- read.delim("patient-data.txt") %>% 
+  tbl_df
 ```
+
+> read the file `patient-data.txt` ***and then*** use the `tbl_df` function
 
 We can re-write our steps from above;
 
 ```{r}
-patients_clean <-
-  mutate(patients, Sex = factor(str_trim(Sex))) %>% 
-  mutate(ID=str_pad(ID,pad = "0",width=3)) %>% 
-  mutate(Height= as.numeric(str_replace_all(Height,pattern = "cm","")))
-patients_clean
+patients_clean <- read.delim("patient-data.txt") %>% 
+  tbl_df %>% 
+  mutate(Sex = factor(str_trim(Sex))) %>% 
+  mutate(Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm","")))
 ```
 
+> read the file `patient-data.txt` ***and then*** use the `tbl_df` function ***and then*** trim the whitespace from the Sex variable ***and then*** replace cm with blank characters in the Height variable
+
+## Exercise: workflow-exercise.Rmd
 
 ******
 
-Take the dataset including the BMI measurements
-
-Re-write in the piping framework
-Add a step to print just the ID, Name, Date of Birth, Smokes and Overweight columns
+Take the steps used to clean the patients dataset and calculate BMI (see template for the code)
+- Re-write in the piping framework
+- Add a step to print just the ID, Name, Date of Birth, Smokes and Overweight columns
 
 ******
 
@@ -160,24 +163,53 @@ top_n(patients_clean,10,Weight)
 ******
 
 Modify the workflow to select the candidates (overweight smokers)
+Write the result to a file
 
 ******
 
-
-```{r}
-mutate(patients_clean, Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg",""))) %>% 
-  mutate(BMI = (Weight/(Height/100)^2), Overweight = BMI > 25) %>% 
-  mutate(Smokes = str_replace_all(Smokes, "Yes", TRUE)) %>% 
-  mutate(Smokes = as.logical(str_replace_all(Smokes, "No", FALSE))) %>% 
-  mutate(Candidate = Smokes & Overweight) %>% 
-  filter(Smokes & Overweight) %>% 
-  select(ID, Name, Birth,Smokes,Overweight)
-
-```
 
 ## Ordering rows: The `arrange` verb
 
 ```{r}
 arrange(patients, Height)
+```
+
+## Re-usable pipelines
+
+Imagine we have a second dataset that we want to process; `cohort-data.txt`. 
+
+
+Take a moment to try and read the data into Excel (/LibreOffice) and consider if you would want to work with these data....
+
+
+```{r eval=FALSE}
+ read.delim("cohort-data.txt") %>% 
+  tbl_df %>% 
+  mutate(Sex = factor(str_trim(Sex))) %>% 
+  mutate(Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg",""))) %>% 
+  mutate(Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm",""))) %>% 
+  mutate(BMI = (Weight/(Height/100)^2), Overweight = BMI > 25) %>% 
+  mutate(Smokes = as.logical(str_replace_all(Smokes, "Yes", TRUE))) %>% 
+  mutate(Smokes = as.logical(str_replace_all(Smokes, "No", FALSE))) %>%
+  filter(Smokes & Overweight) %>% 
+  select(ID, Name, Birth, Smokes,Overweight)  %>% 
+  write.table("study-candidates.txt")
+```
+
+As the file is quite large, we might want to switch to `readr` for smarter and faster reading
+
+```{r eval=FALSE}
+library(readr)
+ read_tsv("cohort-data.txt") %>% 
+  tbl_df %>% 
+  mutate(Sex = factor(str_trim(Sex))) %>% 
+  mutate(Weight = as.numeric(str_replace_all(patients_clean$Weight,"kg",""))) %>% 
+  mutate(Height= as.numeric(str_replace_all(patients_clean$Height,pattern = "cm",""))) %>% 
+  mutate(BMI = (Weight/(Height/100)^2), Overweight = BMI > 25) %>% 
+  mutate(Smokes = str_replace_all(Smokes, "Yes", TRUE)) %>% 
+  mutate(Smokes = as.logical(str_replace_all(Smokes, "No", FALSE))) %>%
+  filter(Smokes & Overweight) %>% 
+  select(ID, Name, Smokes,Overweight)  %>% 
+  write.table("study-candidates.txt")
 ```
 
